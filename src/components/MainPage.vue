@@ -40,17 +40,17 @@
       <p><strong>결과:</strong></p>
       <pre class="result-block">{{ filledPrompt }}</pre>
       <div class="button-container">
-        <Button
-            label="ChatGPT로 보내기"
+        <SplitButton
+            :label="`Run on ${selectedModel}`"
             icon="pi pi-external-link"
-            iconPos="right"
-            @click="sendToChatGPT"
-            class="p-mt-2 p-button-primary"
+            @click="runOnModel"
+            :model="modelOptions"
+            :class="['p-mt-2', getButtonClass]"
         />
         <Button
             label="복사"
             icon="pi pi-copy"
-            iconPos="right"
+            iconPos="left"
             @click="copyToClipboard"
             class="p-mt-2 p-button-secondary"
         />
@@ -60,20 +60,66 @@
 </template>
 
 <script>
-import {computed, reactive, ref, watch} from 'vue';
+import {computed, reactive, ref, watch, onMounted} from 'vue';
 import {store} from '../store.js';
 import {useToast} from 'primevue/usetoast';
+import SplitButton from 'primevue/splitbutton';
+import Dropdown from 'primevue/dropdown';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
 
 export default {
   name: 'MainPage',
+  components: {
+    SplitButton,
+    Dropdown,
+    Button,
+    InputText,
+    Textarea,
+  },
   setup() {
     const toast = useToast();
     const selectedPrompt = ref(null);
     const variables = ref([]);
     const userInputs = reactive({});
     const filledPrompt = ref('');
+    const selectedModel = ref('gpt-4'); // 기본 값 설정
 
-    // 스토어의 prompts 사용
+    // 모델 옵션들
+    const modelOptions = [
+      {label: 'gpt-4', command: () => selectModel('gpt-4')},
+      {label: 'gpt-4o', command: () => selectModel('gpt-4o')},
+      {label: 'gpt-4o-mini', command: () => selectModel('gpt-4o-mini')},
+      {label: 'gpt-4o with Canvas', command: () => selectModel('gpt-4o-canmore')},
+      {label: 'o1-preview', command: () => selectModel('o1-preview')},
+      {label: 'o1-mini', command: () => selectModel('o1-mini')},
+      {separator: true},
+      {label: 'Claude 3.5 Sonnet', command: () => selectModel('Claude 3.5 Sonnet')},
+    ];
+
+    // 버튼 클래스 계산
+    const getButtonClass = computed(() => {
+      return selectedModel.value.toLowerCase().includes('claude')
+          ? 'p-button-claude'
+          : 'p-button-primary';
+    });
+
+    // 모델 선택 함수
+    const selectModel = (model) => {
+      selectedModel.value = model;
+      store.storage.set({selectedModel: model});
+    };
+
+    // 컴포넌트가 마운트될 때 모델을 스토리지에서 불러옴
+    onMounted(() => {
+      store.storage.get('selectedModel', (data) => {
+        if (data.selectedModel) {
+          selectedModel.value = data.selectedModel;
+        }
+      });
+    });
+
     const prompts = computed(() => {
       return store.prompts.value.map((prompt, index) => ({
         text: prompt,
@@ -82,15 +128,12 @@ export default {
       }));
     });
 
-    // 프롬프트 변경 감지
     watch(selectedPrompt, (newPrompt) => {
       if (newPrompt) {
-        // 변수 추출
         const varMatches = newPrompt.match(/{(.*?)}/g);
         variables.value = varMatches
             ? varMatches.map((v) => v.replace(/[{}]/g, ''))
             : [];
-        // 입력 초기화
         variables.value.forEach((variable) => {
           userInputs[variable] = '';
         });
@@ -100,12 +143,10 @@ export default {
       }
     });
 
-    // 정규식 특수 문자 이스케이프 함수
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
-    // 프롬프트 생성 함수
     const generatePrompt = () => {
       if (selectedPrompt.value) {
         let tempPrompt = selectedPrompt.value;
@@ -121,16 +162,17 @@ export default {
       }
     };
 
-    // ChatGPT로 전달 함수
-    const sendToChatGPT = () => {
+    const runOnModel = () => {
       if (filledPrompt.value) {
         const encodedPrompt = encodeURIComponent(filledPrompt.value);
-        const url = `https://chat.openai.com/?model=gpt-4&q=${encodedPrompt}`;
+        const model = selectedModel.value;
+        const url = model === 'Claude sonnet'
+            ? `https://claude.ai/new?q=${encodedPrompt}`
+            : `https://chat.openai.com/?model=${model}&q=${encodedPrompt}`;
         window.open(url, '_blank');
       }
     };
 
-    // 클립보드 복사 함수
     const copyToClipboard = async () => {
       try {
         await navigator.clipboard.writeText(filledPrompt.value);
@@ -157,9 +199,12 @@ export default {
       userInputs,
       generatePrompt,
       filledPrompt,
-      sendToChatGPT,
+      runOnModel,
       copyToClipboard,
       store,
+      selectedModel,
+      modelOptions,
+      getButtonClass,
     };
   },
 };
@@ -175,7 +220,7 @@ export default {
 }
 
 .dropdown-container {
-  margin-bottom: 1.5rem; /* Dropdown과 변수 입력 필드 사이의 여백 */
+  margin-bottom: 1.5rem;
 }
 
 .variables-container {
@@ -183,23 +228,49 @@ export default {
 }
 
 .variable-field {
-  margin-bottom: 1rem; /* 각 변수 필드 사이의 여백 */
+  margin-bottom: 1rem;
 }
 
 .button-container {
   display: flex;
-  justify-content: flex-end; /* 우측 정렬 */
-  gap: 0.5rem; /* 버튼 사이 간격 */
+  justify-content: flex-end;
+  gap: 0.5rem;
   margin-top: 1rem;
 }
 
 .result-block {
-  background-color: #f5f5f5; /* 코드 블럭 느낌을 주기 위한 회색 배경 */
+  background-color: #f5f5f5;
   padding: 1rem;
   border-radius: 4px;
   font-family: monospace;
-  white-space: pre-wrap; /* 줄바꿈이 적용되도록 */
+  white-space: pre-wrap;
   border: 1px solid #ddd;
   overflow-x: auto;
+}
+
+/* Claude 모델용 버튼 스타일 수정 */
+:deep(.p-button-claude) button.p-splitbutton-defaultbutton {
+  background: #AB4E1C !important;
+  border-color: #AB4E1C !important;
+}
+
+:deep(.p-button-claude) button.p-splitbutton-defaultbutton:hover {
+  background: #8B3E12 !important;
+  border-color: #8B3E12 !important;
+}
+
+:deep(.p-button-claude) button.p-splitbutton-menubutton {
+  background: #AB4E1C !important;
+  border-color: #AB4E1C !important;
+}
+
+:deep(.p-button-claude) button.p-splitbutton-menubutton:hover {
+  background: #8B3E12 !important;
+  border-color: #8B3E12 !important;
+}
+
+/* Split 버튼 사이의 구분선 색상도 맞춤 */
+:deep(.p-button-claude) button.p-splitbutton-menubutton:before {
+  border-left-color: rgba(255, 255, 255, 0.3) !important;
 }
 </style>

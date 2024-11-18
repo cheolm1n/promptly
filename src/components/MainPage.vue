@@ -79,7 +79,7 @@ export default {
     Textarea,
   },
   setup() {
-    const storage = useChromeStorage()
+    const storage = useChromeStorage();
     const toast = useToast();
     const selectedPrompt = ref(null);
     const variables = ref([]);

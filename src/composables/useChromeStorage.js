@@ -1,31 +1,32 @@
 import {ref} from "vue";
 
-const alternativeStorage = {}
+const alternativeStorage = {};
 
 export default function useChromeStorage() {
-    const prompts = ref([])
-    const loaded = ref(false)
-    const isChromeStorageAvailable = ref(typeof window.chrome !== 'undefined' && window.chrome.storage)
+    const prompts = ref([]);
+    const loaded = ref(false);
+    const isChromeStorageAvailable = ref(typeof window.chrome !== 'undefined' && window.chrome.storage);
 
     function get(key, callback) {
         if (isChromeStorageAvailable) {
-            window.chrome.storage.sync.get(key, callback)
+            window.chrome.storage.sync.get(key, callback);
         } else {
-            alternativeStorage[key] = JSON.parse(localStorage.getItem(key))
+            alternativeStorage[key] = JSON.parse(localStorage.getItem(key));
             if (callback) {
-                callback(alternativeStorage)
+                callback(alternativeStorage);
             }
         }
     }
+
     function set(key, callback) {
         if (isChromeStorageAvailable) {
-            window.chrome.storage.sync.set(key, callback)
+            window.chrome.storage.sync.set(key, callback);
         } else {
             for (const key in alternativeStorage) {
-                localStorage.setItem(key, JSON.stringify(alternativeStorage[key]))
+                localStorage.setItem(key, JSON.stringify(alternativeStorage[key]));
             }
             if (callback) {
-                callback()
+                callback();
             }
         }
     }
@@ -36,19 +37,19 @@ export default function useChromeStorage() {
                 get('prompts', (data) => {
                     // 불러온 데이터가 배열인지 확인하고, 아니면 빈 배열로 초기화
                     if (Array.isArray(data.prompts)) {
-                        prompts.value = data.prompts
+                        prompts.value = data.prompts;
                     } else {
-                        prompts.value = data.prompts ? Object.values(data.prompts) : []
-                        loaded.value = true // 데이터 로딩 완료 표시
+                        prompts.value = data.prompts ? Object.values(data.prompts) : [];
+                        loaded.value = true; // 데이터 로딩 완료 표시
                     }
-                    resolve(prompts)
-                })
+                    resolve(prompts);
+                });
             }
-        })
+        });
     }
 
     // 컴포넌트에서 호출할 수 있도록 초기화를 유지함
-    loadPrompts()
+    loadPrompts();
 
     return {
         prompts,
@@ -57,5 +58,5 @@ export default function useChromeStorage() {
         set,
         loadPrompts,
         isChromeStorageAvailable,
-    }
+    };
 }

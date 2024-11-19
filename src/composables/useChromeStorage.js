@@ -5,10 +5,10 @@ const alternativeStorage = {};
 export default function useChromeStorage() {
     const prompts = ref([]);
     const loaded = ref(false);
-    const isChromeStorageAvailable = ref(typeof window.chrome !== 'undefined' && window.chrome.storage);
+    const isChromeStorageAvailable = ref(typeof window.chrome !== 'undefined' && window.chrome.storage !== undefined);
 
     function get(key, callback) {
-        if (isChromeStorageAvailable) {
+        if (isChromeStorageAvailable.value) {
             window.chrome.storage.sync.get(key, callback);
         } else {
             alternativeStorage[key] = JSON.parse(localStorage.getItem(key));
@@ -19,7 +19,7 @@ export default function useChromeStorage() {
     }
 
     function set(key, callback) {
-        if (isChromeStorageAvailable) {
+        if (isChromeStorageAvailable.value) {
             window.chrome.storage.sync.set(key, callback);
         } else {
             for (const key in alternativeStorage) {

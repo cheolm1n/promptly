@@ -40,8 +40,8 @@ export default function useChromeStorage() {
                         prompts.value = data.prompts;
                     } else {
                         prompts.value = data.prompts ? Object.values(data.prompts) : [];
-                        loaded.value = true; // 데이터 로딩 완료 표시
                     }
+                    loaded.value = true; // 데이터 로딩 완료 표시
                     resolve(prompts);
                 });
             }

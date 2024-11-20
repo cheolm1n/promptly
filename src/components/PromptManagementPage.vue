@@ -84,8 +84,8 @@ export default {
     const prompts = ref([]);
 
     // 데이터 로드 완료 상태
-    storage.loadPrompts().then((loadedPrompts) => {
-      prompts.value = loadedPrompts.value.map((text, idx) => ({
+    storage.loadPrompts().then(() => {
+      prompts.value = storage.prompts.value.map((text, idx) => ({
         id: Date.now() + idx,
         text,
       }));

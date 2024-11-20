@@ -1,7 +1,5 @@
 import {ref} from "vue";
 
-const alternativeStorage = {};
-
 export default function useChromeStorage() {
     const prompts = ref([]);
     const loaded = ref(false);
@@ -11,19 +9,20 @@ export default function useChromeStorage() {
         if (isChromeStorageAvailable.value) {
             window.chrome.storage.sync.get(key, callback);
         } else {
-            alternativeStorage[key] = JSON.parse(localStorage.getItem(key));
+            const data = {}
+            data[key] = JSON.parse(localStorage.getItem(key));
             if (callback) {
-                callback(alternativeStorage);
+                callback(data);
             }
         }
     }
 
-    function set(key, callback) {
+    function set(data, callback) {
         if (isChromeStorageAvailable.value) {
-            window.chrome.storage.sync.set(key, callback);
+            window.chrome.storage.sync.set(data, callback);
         } else {
-            for (const key in alternativeStorage) {
-                localStorage.setItem(key, JSON.stringify(alternativeStorage[key]));
+            for (const key in data) {
+                localStorage.setItem(key, JSON.stringify(data[key]));
             }
             if (callback) {
                 callback();
@@ -31,7 +30,7 @@ export default function useChromeStorage() {
         }
     }
 
-    function loadPrompts() {
+    async function loadPrompts() {
         return new Promise(resolve => {
             if (!loaded.value) { // 이미 로드된 경우 실행하지 않음
                 get('prompts', (data) => {
@@ -42,9 +41,9 @@ export default function useChromeStorage() {
                         prompts.value = data.prompts ? Object.values(data.prompts) : [];
                     }
                     loaded.value = true; // 데이터 로딩 완료 표시
-                    resolve(prompts);
                 });
             }
+            resolve();
         });
     }
 

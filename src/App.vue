@@ -1,23 +1,23 @@
 <template>
-  <div id="app">
     <Toast />
     <div class="tab-header">
       <Button
+          text
           label="MAIN"
           @click="activeTab = 'main'"
-          :class="{'p-button-text': true, 'active': activeTab === 'main'}"
+          :class="{'active': activeTab === 'main'}"
       />
       <Button
+          text
           label="MANAGE"
           @click="activeTab = 'manage'"
-          :class="{'p-button-text': true, 'active': activeTab === 'manage'}"
+          :class="{'active': activeTab === 'manage'}"
       />
     </div>
     <div class="tab-content">
       <MainPage v-if="activeTab === 'main'" />
       <PromptManagementPage v-else />
     </div>
-  </div>
 </template>
 
 <script>
@@ -74,8 +74,27 @@ export default {
 }
 
 /* 선택된 탭 버튼 스타일 */
-.tab-header .active {
+.tab-header .active,
+.tab-header .active:hover {
   font-weight: bold;
-  border-bottom: 2px solid #007ad9;
+  border-bottom: 2px solid var(--p-button-text-primary-color) !important;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  color: var(--p-button-text-primary-color) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  #app {
+    background-color:#0A0A0B;
+  }
+
+  .tab-header {
+    background-color: #0A0A0B;
+    border-bottom: 1px solid #666;
+  }
+
+  .tab-header .active {
+    color: #007ad9;
+  }
 }
 </style>

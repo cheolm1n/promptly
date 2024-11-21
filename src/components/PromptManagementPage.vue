@@ -405,4 +405,15 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
+
+@media (prefers-color-scheme: dark) {
+  .prompt-card {
+    background-color: #18181b;
+    border: 1px solid #18181b;
+  }
+
+  .prompt-actions-overlay {
+    background-color: rgba(24, 24, 27, 0.7);
+  }
+}
 </style>

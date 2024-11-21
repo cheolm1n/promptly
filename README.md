@@ -46,7 +46,7 @@ AI 모델을 활용해 작업할 때 자주 사용되는 프롬프트를 관리�
 - [x] 저장된 프롬프트의 순서 변경
 - [ ] 첫 사용자를 위한 샘플 추가
 - [ ] 영문화 or 다국어화 (+ 개인 설정 추가)
-- [ ] primevue 버전 최신화
+- [x] primevue 버전 최신화
 - [ ] manage 페이지의 tab-content 영역의 가로 너비 확장
 - [ ] `Run on` ... 버튼에서 모델 이름 강조
 - [ ] `Run on` -> `Chat with` 로 변경
@@ -54,4 +54,5 @@ AI 모델을 활용해 작업할 때 자주 사용되는 프롬프트를 관리�
 - [ ] 신규 모델 - 퍼플렉시티 추가
 - [ ] chat 서비스의 UI에서 promptly 실행
 - [ ] 토스트 팝업 위치 조정 (가운데로)
-- [ ] storage.js를 composable로 교체 (by @jongwoo328)
+- [x] storage.js를 composable로 교체
+- [x] 라이트/다크 모드 지원 

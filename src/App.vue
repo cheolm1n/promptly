@@ -1,5 +1,5 @@
 <template>
-    <Toast />
+    <Toast position="top-center" class="promptly-toast" />
     <div class="tab-header">
       <Button
           text
@@ -96,5 +96,9 @@ export default {
   .tab-header .active {
     color: #007ad9;
   }
+}
+
+.promptly-toast {
+  --p-toast-width: 90%;
 }
 </style>

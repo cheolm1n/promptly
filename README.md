@@ -56,3 +56,8 @@ AI 모델을 활용해 작업할 때 자주 사용되는 프롬프트를 관리�
 - [ ] 토스트 팝업 위치 조정 (가운데로)
 - [x] storage.js를 composable로 교체
 - [x] 라이트/다크 모드 지원 
+- [x] 아이콘 교체
+
+## 만든이
+- 개발: [![GitHub Badge](https://img.shields.io/badge/-cheolm1n-181717?style=flat-square&logo=github&logoColor=white&link=https://github.com/cheolm1n)](https://github.com/cheolm1n) [![GitHub Badge](https://img.shields.io/badge/-jongwoo328-181717?style=flat-square&logo=github&logoColor=white&link=https://github.com/jongwoo328)](https://github.com/jongwoo328)
+- 아이콘 디자인: [![Instagram Badge](https://img.shields.io/badge/-su.roo0v0-E4405F?style=flat-square&logo=Instagram&logoColor=white&link=https://www.instagram.com/su.roo0v0)](https://www.instagram.com/su.roo0v0)

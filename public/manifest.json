@@ -14,7 +14,7 @@
   },
   "permissions": ["storage"],
   "icons": {
-    "128": "icons/icon128.png"
+    "128": "icons/appicon_blue_128.png"
   },
   "host_permissions": ["https://chat.openai.com/*"]
 }

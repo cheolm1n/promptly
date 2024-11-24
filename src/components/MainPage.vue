@@ -41,7 +41,7 @@
       <pre class="result-block">{{ filledPrompt }}</pre>
       <div class="button-container">
         <SplitButton
-            :label="`Chat with ${selectedModel}`"
+            :label="`Chat with ${this.getModelLabel(selectedModel)}`"
             icon="pi pi-external-link"
             @click="chatWithModel"
             :model="modelOptions"
@@ -77,17 +77,19 @@ export default {
 
     // 모델 옵션들
     const modelOptions = [
-      {label: 'gpt-4', command: () => selectModel('gpt-4')},
-      {label: 'gpt-4o', command: () => selectModel('gpt-4o')},
-      {label: 'gpt-4o-mini', command: () => selectModel('gpt-4o-mini')},
-      {label: 'gpt-4o-canmore', command: () => selectModel('gpt-4o-canmore')},
-      {label: 'o1-preview', command: () => selectModel('o1-preview')},
-      {label: 'o1-mini', command: () => selectModel('o1-mini')},
+      {label: 'ChatGPT 4', model: 'gpt-4'},
+      {label: 'ChatGPT 4o', model: 'gpt-4o'},
+      {label: 'ChatGPT 4o mini', model: 'gpt-4o-mini'},
+      {label: 'ChatGPT 4o with anvas', model: 'gpt-4o-canmore'},
+      {label: 'ChatGPT o1-preview', model: 'o1-preview'},
+      {label: 'ChatGPT o1-mini', model: 'o1-mini'},
       {separator: true},
-      {label: 'Claude 3.5 Sonnet', command: () => selectModel('Claude 3.5 Sonnet')},
-      {separator: true},
-      {label: 'Perplexity', command: () => selectModel('Perplexity')},
-    ];
+      {label: 'Claude 3.5 Sonnet', model: 'Claude 3.5 Sonnet'},
+      {label: 'Perplexity', model: 'Perplexity'},
+    ].map(option => ({
+      ...option,
+      command: () => selectModel(option.model) // command를 동적으로 생성
+    }));
 
     // 버튼 클래스 계산
     const getButtonClass = computed(() => {
@@ -107,6 +109,12 @@ export default {
     const selectModel = (model) => {
       selectedModel.value = model;
       storage.set({selectedModel: model});
+    };
+
+    // 모델의 라벨을 가져오는 함수
+    const getModelLabel = (model) => {
+      const option = modelOptions.find(option => option.model === model);
+      return option ? option.label : model;
     };
 
     // 컴포넌트가 마운트될 때 모델을 스토리지에서 불러옴
@@ -209,6 +217,7 @@ export default {
       selectedModel,
       modelOptions,
       getButtonClass,
+      getModelLabel,
     };
   },
 };

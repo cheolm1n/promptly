@@ -85,13 +85,22 @@ export default {
       {label: 'o1-mini', command: () => selectModel('o1-mini')},
       {separator: true},
       {label: 'Claude 3.5 Sonnet', command: () => selectModel('Claude 3.5 Sonnet')},
+      {separator: true},
+      {label: 'Perplexity', command: () => selectModel('Perplexity')},
     ];
 
     // 버튼 클래스 계산
     const getButtonClass = computed(() => {
-      return selectedModel.value.toLowerCase().includes('claude')
-          ? 'p-button-claude'
-          : 'p-button-primary';
+      const model = selectedModel.value.toLowerCase();
+      console.log(model)
+      if (model.includes('claude')) {
+        return 'p-button-claude';
+      } else if (model.includes('perplexity')) {
+        console.log("perplexity")
+        return 'p-button-perplexity';
+      } else {
+        return 'p-button-primary';
+      }
     });
 
     // 모델 선택 함수
@@ -154,10 +163,17 @@ export default {
     const runOnModel = () => {
       if (filledPrompt.value) {
         const encodedPrompt = encodeURIComponent(filledPrompt.value);
-        const model = selectedModel.value;
-        const url = model.toLowerCase().includes('claude')
-            ? `https://claude.ai/new?q=${encodedPrompt}`
-            : `https://chat.openai.com/?model=${model}&q=${encodedPrompt}`;
+        const model = selectedModel.value.toLowerCase();
+        let url;
+
+        if (model.includes('claude')) {
+          url = `https://claude.ai/new?q=${encodedPrompt}`;
+        } else if (model.includes('perplexity')) {
+          url = `https://perplexity.ai/search?q=${encodedPrompt}`;
+        } else {
+          url = `https://chat.openai.com/?model=${model}&q=${encodedPrompt}`;
+        }
+
         window.open(url, '_blank');
       }
     };
@@ -236,17 +252,7 @@ export default {
   overflow-x: auto;
 }
 
-/* Claude 모델용 버튼 스타일 수정 */
-:deep(.p-button-claude) button {
-  background: #AB4E1C !important;
-  border-color: #AB4E1C !important;
-}
-
-:deep(.p-button-claude) button:hover {
-  background: #8B3E12 !important;
-  border-color: #8B3E12 !important;
-}
-
+/* Claude 모델용 버튼 스타일 */
 :deep(.p-button-claude) button {
   background: #AB4E1C !important;
   border-color: #AB4E1C !important;
@@ -259,6 +265,22 @@ export default {
 
 /* Split 버튼 사이의 구분선 색상도 맞춤 */
 :deep(.p-button-claude) button:before {
+  border-left-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Perplexity 모델용 버튼 스타일 */
+:deep(.p-button-perplexity) button {
+  background: #6a1b9a !important;
+  border-color: #6a1b9a !important;
+}
+
+:deep(.p-button-perplexity) button:hover {
+  background: #4a148c !important;
+  border-color: #4a148c !important;
+}
+
+/* Split 버튼 사이의 구분선 색상도 맞춤 */
+:deep(.p-button-perplexity) button:before {
   border-left-color: rgba(255, 255, 255, 0.3) !important;
 }
 

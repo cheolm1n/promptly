@@ -33,9 +33,9 @@ export default function useChromeStorage() {
     async function loadPrompts() {
         if (loaded.value) return; // 이미 로드된 경우 실행하지 않음
         return new Promise((resolve) => {
-            get('isFirstUse', (initData) => {
+            get('hasUsedBefore', (initData) => {
                 get('prompts', (data) => {
-                    if (!initData.isFirstUse && (!data.prompts || data.prompts.length === 0)) {
+                    if (!initData.hasUsedBefore && (!data.prompts || data.prompts.length === 0)) {
                         // 첫 사용이고 저장된 프롬프트가 없을 경우 기본 예제 추가
                         const defaultPrompts = [
                             "(샘플) 다음 텍스트를 {언어}로 번역해주세요:\n{텍스트}",
@@ -43,7 +43,7 @@ export default function useChromeStorage() {
                             "(샘플) {제품명}의 {타겟 시장}을 위한 효과적인 마케팅 전략을 작성해주세요.\n주요 목표는 {목표}입니다."
                         ];
                         prompts.value = defaultPrompts;
-                        set({ prompts: defaultPrompts.map(prompt => prompt), isFirstUse: true }, () => {
+                        set({ prompts: defaultPrompts.map(prompt => prompt), hasUsedBefore: true }, () => {
                             loaded.value = true; // 데이터 로딩 완료 표시
                             resolve();
                         });

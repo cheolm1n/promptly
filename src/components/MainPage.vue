@@ -41,9 +41,9 @@
       <pre class="result-block">{{ filledPrompt }}</pre>
       <div class="button-container">
         <SplitButton
-            :label="`Run on ${selectedModel}`"
+            :label="`Chat with ${selectedModel}`"
             icon="pi pi-external-link"
-            @click="runOnModel"
+            @click="chatWithModel"
             :model="modelOptions"
             :class="['p-mt-2', getButtonClass]"
         />
@@ -160,7 +160,7 @@ export default {
       }
     };
 
-    const runOnModel = () => {
+    const chatWithModel = () => {
       if (filledPrompt.value) {
         const encodedPrompt = encodeURIComponent(filledPrompt.value);
         const model = selectedModel.value.toLowerCase();
@@ -204,7 +204,7 @@ export default {
       userInputs,
       generatePrompt,
       filledPrompt,
-      runOnModel,
+      chatWithModel,
       copyToClipboard,
       selectedModel,
       modelOptions,

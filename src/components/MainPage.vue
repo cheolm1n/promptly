@@ -41,12 +41,26 @@
       <pre class="result-block">{{ filledPrompt }}</pre>
       <div class="button-container">
         <SplitButton
-            :label="`Run on ${selectedModel}`"
             icon="pi pi-external-link"
-            @click="runOnModel"
+            @click="chatWithModel"
             :model="modelOptions"
+            style="width: fit-content"
+            :pt="{
+            pcButton: {
+              root: {
+                class: 'run-model-button'
+              },
+            }
+          }"
             :class="['p-mt-2', getButtonClass]"
-        />
+        >
+          <span style="display: flex; gap: .25rem">
+            <span>
+              Chat with
+            </span>
+            <span style="font-weight: bold">{{ getModelLabel(selectedModel) }}</span>
+          </span>
+        </SplitButton>
         <Button
             label="복사"
             icon="pi pi-copy"
@@ -77,27 +91,42 @@ export default {
 
     // 모델 옵션들
     const modelOptions = [
-      {label: 'gpt-4', command: () => selectModel('gpt-4')},
-      {label: 'gpt-4o', command: () => selectModel('gpt-4o')},
-      {label: 'gpt-4o-mini', command: () => selectModel('gpt-4o-mini')},
-      {label: 'gpt-4o-canmore', command: () => selectModel('gpt-4o-canmore')},
-      {label: 'o1-preview', command: () => selectModel('o1-preview')},
-      {label: 'o1-mini', command: () => selectModel('o1-mini')},
+      {label: 'ChatGPT 4', model: 'gpt-4'},
+      {label: 'ChatGPT 4o', model: 'gpt-4o'},
+      {label: 'ChatGPT 4o mini', model: 'gpt-4o-mini'},
+      {label: 'ChatGPT 4o with canvas', model: 'gpt-4o-canmore'},
+      {label: 'ChatGPT o1-preview', model: 'o1-preview'},
+      {label: 'ChatGPT o1-mini', model: 'o1-mini'},
       {separator: true},
-      {label: 'Claude 3.5 Sonnet', command: () => selectModel('Claude 3.5 Sonnet')},
-    ];
+      {label: 'Claude 3.5 Sonnet', model: 'Claude 3.5 Sonnet'},
+      {label: 'Perplexity', model: 'Perplexity'},
+    ].map(option => ({
+      ...option,
+      command: () => selectModel(option.model) // command를 동적으로 생성
+    }));
 
     // 버튼 클래스 계산
     const getButtonClass = computed(() => {
-      return selectedModel.value.toLowerCase().includes('claude')
-          ? 'p-button-claude'
-          : 'p-button-primary';
+      const model = selectedModel.value.toLowerCase();
+      if (model.includes('claude')) {
+        return 'p-button-claude';
+      } else if (model.includes('perplexity')) {
+        return 'p-button-perplexity';
+      } else {
+        return 'p-button-primary';
+      }
     });
 
     // 모델 선택 함수
     const selectModel = (model) => {
       selectedModel.value = model;
       storage.set({selectedModel: model});
+    };
+
+    // 모델의 라벨을 가져오는 함수
+    const getModelLabel = (model) => {
+      const option = modelOptions.find(option => option.model === model);
+      return option ? option.label : model;
     };
 
     // 컴포넌트가 마운트될 때 모델을 스토리지에서 불러옴
@@ -151,13 +180,20 @@ export default {
       }
     };
 
-    const runOnModel = () => {
+    const chatWithModel = () => {
       if (filledPrompt.value) {
         const encodedPrompt = encodeURIComponent(filledPrompt.value);
-        const model = selectedModel.value;
-        const url = model.toLowerCase().includes('claude')
-            ? `https://claude.ai/new?q=${encodedPrompt}`
-            : `https://chat.openai.com/?model=${model}&q=${encodedPrompt}`;
+        const model = selectedModel.value.toLowerCase();
+        let url;
+
+        if (model.includes('claude')) {
+          url = `https://claude.ai/new?q=${encodedPrompt}`;
+        } else if (model.includes('perplexity')) {
+          url = `https://perplexity.ai/search?q=${encodedPrompt}`;
+        } else {
+          url = `https://chat.openai.com/?model=${model}&q=${encodedPrompt}`;
+        }
+
         window.open(url, '_blank');
       }
     };
@@ -188,11 +224,12 @@ export default {
       userInputs,
       generatePrompt,
       filledPrompt,
-      runOnModel,
+      chatWithModel,
       copyToClipboard,
       selectedModel,
       modelOptions,
       getButtonClass,
+      getModelLabel,
     };
   },
 };
@@ -236,17 +273,7 @@ export default {
   overflow-x: auto;
 }
 
-/* Claude 모델용 버튼 스타일 수정 */
-:deep(.p-button-claude) button {
-  background: #AB4E1C !important;
-  border-color: #AB4E1C !important;
-}
-
-:deep(.p-button-claude) button:hover {
-  background: #8B3E12 !important;
-  border-color: #8B3E12 !important;
-}
-
+/* Claude 모델용 버튼 스타일 */
 :deep(.p-button-claude) button {
   background: #AB4E1C !important;
   border-color: #AB4E1C !important;
@@ -262,10 +289,33 @@ export default {
   border-left-color: rgba(255, 255, 255, 0.3) !important;
 }
 
+/* Perplexity 모델용 버튼 스타일 */
+:deep(.p-button-perplexity) button {
+  background: #6a1b9a !important;
+  border-color: #6a1b9a !important;
+}
+
+:deep(.p-button-perplexity) button:hover {
+  background: #4a148c !important;
+  border-color: #4a148c !important;
+}
+
+/* Split 버튼 사이의 구분선 색상도 맞춤 */
+:deep(.p-button-perplexity) button:before {
+  border-left-color: rgba(255, 255, 255, 0.3) !important;
+}
+
 @media (prefers-color-scheme: dark) {
   .result-block {
     background-color: #18181b;
     border: 1px solid #18181b;
   }
+}
+
+:deep(.run-model-button) {
+  width: fit-content;
+  font-size: 16px;
+  padding-right: .75rem;
+  padding-left: .75rem;
 }
 </style>

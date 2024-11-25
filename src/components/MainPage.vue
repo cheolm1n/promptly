@@ -320,7 +320,7 @@ export default {
   padding-left: .75rem;
 }
 
-:deep(.p-select-overlay ){
+:deep(.p-select-overlay){
   width: 100px !important;
 }
 

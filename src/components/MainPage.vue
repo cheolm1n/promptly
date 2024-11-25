@@ -108,11 +108,9 @@ export default {
     // 버튼 클래스 계산
     const getButtonClass = computed(() => {
       const model = selectedModel.value.toLowerCase();
-      console.log(model)
       if (model.includes('claude')) {
         return 'p-button-claude';
       } else if (model.includes('perplexity')) {
-        console.log("perplexity")
         return 'p-button-perplexity';
       } else {
         return 'p-button-primary';

@@ -321,7 +321,7 @@ export default {
 }
 
 :deep(.p-select-overlay){
-  width: 100px !important;
+  width: 100% !important;
 }
 
 </style>

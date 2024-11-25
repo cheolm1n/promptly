@@ -41,12 +41,26 @@
       <pre class="result-block">{{ filledPrompt }}</pre>
       <div class="button-container">
         <SplitButton
-            :label="`Chat with ${this.getModelLabel(selectedModel)}`"
             icon="pi pi-external-link"
             @click="chatWithModel"
             :model="modelOptions"
+            style="width: fit-content"
+            :pt="{
+            pcButton: {
+              root: {
+                class: 'run-model-button'
+              },
+            }
+          }"
             :class="['p-mt-2', getButtonClass]"
-        />
+        >
+          <span style="display: flex; gap: .25rem">
+            <span>
+              Chat with
+            </span>
+            <span style="font-weight: bold">{{ getModelLabel(selectedModel) }}</span>
+          </span>
+        </SplitButton>
         <Button
             label="복사"
             icon="pi pi-copy"
@@ -298,5 +312,12 @@ export default {
     background-color: #18181b;
     border: 1px solid #18181b;
   }
+}
+
+:deep(.run-model-button) {
+  width: fit-content;
+  font-size: 16px;
+  padding-right: .75rem;
+  padding-left: .75rem;
 }
 </style>

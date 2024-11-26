@@ -264,13 +264,6 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  max-width: 100%;
-  padding: 1em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
 .textarea {
   width: 100%;

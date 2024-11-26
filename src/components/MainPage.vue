@@ -8,6 +8,7 @@
           v-model="selectedPrompt"
           placeholder="프롬프트를 선택하세요"
           style="width: 100%; margin-bottom: 1rem;"
+          append-to="self"
       />
 
       <div v-if="variables.length" class="variables-container">
@@ -318,4 +319,9 @@ export default {
   padding-right: .75rem;
   padding-left: .75rem;
 }
+
+:deep(.p-select-overlay){
+  width: 100% !important;
+}
+
 </style>

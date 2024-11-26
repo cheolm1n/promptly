@@ -1,0 +1,101 @@
+{
+    "selectPromptLabel": {
+        "message": "Please select a prompt."
+    },
+    "inputLabel": {
+        "message": "Input"
+    },
+    "viewResultLabel": {
+        "message": "Prompt Combination"
+    },
+    "resultLabel": {
+        "message": "Result"
+    },
+    "chatWithLabel": {
+        "message": "Chat with"
+    },
+    "copyLabel": {
+        "message": "Copy"
+    },
+    "addPromptLabelPlaceholder": {
+        "message": "Try writing a new prompt including {variable}!"
+    },
+    "addPromptLabel": {
+        "message": "Add Prompt"
+    },
+    "menuLabel": {
+        "message": "Menu"
+    },
+    "importPromptLabel": {
+        "message": "Import Prompt(s)"
+    },
+    "overwritePromptLabel": {
+        "message": "Overwrite Prompt(s)"
+    },
+    "copyToClipboardSuccessMessage": {
+        "message": "Prompt has been copied to clipboard."
+    },
+    "copyToClipboardErrorMessage": {
+        "message": "Prompt has been copied to clipboard."
+    },
+    "appendPromptLabel": {
+        "message": "Add New"
+    },
+    "saveLabel": {
+        "message": "Save"
+    },
+    "cancelLabel": {
+        "message": "Cancel"
+    },
+    "editLabel": {
+        "message": "Edit"
+    },
+    "duplicateLabel": {
+        "message": "Duplicate"
+    },
+    "deleteLabel": {
+        "message": "Delete"
+    },
+    "moveUpLabel": {
+        "message": "Move Up"
+    },
+    "moveDownLabel": {
+        "message": "Move Down"
+    },
+    "exportPrompt": {
+        "message": "Export Prompt(s)"
+    },
+    "importPrompt": {
+        "message": "Import Prompt(s)"
+    },
+    "addPromptMessage": {
+        "message": "Prompt has been added."
+    },
+    "updatePromptMessage": {
+        "message": "Prompt has been updated."
+    },
+    "deletePromptMessage": {
+        "message": "Prompt has been deleted."
+    },
+    "duplicatePromptMessage": {
+        "message": "Prompt has been duplicated."
+    },
+    "overwritePromptMessage": {
+        "message": "Prompt has been overwritten."
+    },
+    "appendPromptMessage": {
+        "message": "Prompt has been added."
+    },
+    "error": {
+        "message": "Error"
+    },
+    "jsonValidationErrorMessage": {
+        "message": "Invalid JSON format."
+    },
+    "success": {
+        "message": "Success"
+    },
+    "loadingMessage": {
+        "message": "Loading..."
+    }
+}

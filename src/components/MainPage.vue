@@ -6,7 +6,7 @@
           optionLabel="text"
           optionValue="value"
           v-model="selectedPrompt"
-          placeholder="프롬프트를 선택하세요"
+          :placeholder="getMessage('selectPromptLabel')"
           style="width: 100%; margin-bottom: 1rem;"
           append-to="self"
       />
@@ -17,7 +17,7 @@
             :key="index"
             class="p-field variable-field"
         >
-          <label :for="'var_' + index">{{ variable }} 입력:</label>
+          <label :for="'var_' + index">{{ variable }} {{ getMessage('inputLabel') }}:</label>
           <component
               :is="userInputs[variable].length > 50 ? 'Textarea' : 'InputText'"
               v-model="userInputs[variable]"
@@ -31,14 +31,14 @@
     </div>
     <div class="button-container">
       <Button
-          label="결과 보기"
+          :label="getMessage('viewResultLabel')"
           @click="generatePrompt"
           class="result-button"
           :disabled="!selectedPrompt"
       />
     </div>
     <div v-if="filledPrompt" class="p-mt-3">
-      <p><strong>결과:</strong></p>
+      <p><strong>{{ getMessage('resultLabel') }}:</strong></p>
       <pre class="result-block">{{ filledPrompt }}</pre>
       <div class="button-container">
         <SplitButton
@@ -57,13 +57,13 @@
         >
           <span style="display: flex; gap: .25rem">
             <span>
-              Chat with
+              {{ getMessage('chatWithLabel') }}
             </span>
             <span style="font-weight: bold">{{ getModelLabel(selectedModel) }}</span>
           </span>
         </SplitButton>
         <Button
-            label="복사"
+            :label="getMessage('copyLabel')"
             icon="pi pi-copy"
             iconPos="left"
             @click="copyToClipboard"
@@ -78,11 +78,13 @@
 import {computed, reactive, ref, watch, onMounted} from 'vue';
 import {useToast} from 'primevue/usetoast';
 import useChromeStorage from "../composables/useChromeStorage";
+import useI18n from "../composables/useI18n";
 
 export default {
   name: 'MainPage',
   setup() {
     const storage = useChromeStorage();
+    const { getMessage } = useI18n();
     const toast = useToast();
     const selectedPrompt = ref(null);
     const variables = ref([]);
@@ -100,6 +102,7 @@ export default {
       {label: 'ChatGPT o1-mini', model: 'o1-mini'},
       {separator: true},
       {label: 'Claude 3.5 Sonnet', model: 'Claude 3.5 Sonnet'},
+      {separator: true},
       {label: 'Perplexity', model: 'Perplexity'},
     ].map(option => ({
       ...option,
@@ -204,15 +207,15 @@ export default {
         await navigator.clipboard.writeText(filledPrompt.value);
         toast.add({
           severity: 'success',
-          summary: '복사 완료',
-          detail: '프롬프트가 클립보드에 복사되었습니다!',
+          summary: getMessage('success'),
+          detail: getMessage('copyToClipboardSuccessMessage'),
           life: 1000,
         });
       } catch (error) {
         toast.add({
           severity: 'error',
-          summary: '복사 실패',
-          detail: '클립보드에 복사할 수 없습니다.',
+          summary: getMessage('error'),
+          detail: getMessage('copyToClipboardErrorMessage'),
           life: 1000,
         });
       }
@@ -231,6 +234,7 @@ export default {
       modelOptions,
       getButtonClass,
       getModelLabel,
+      getMessage,
     };
   },
 };

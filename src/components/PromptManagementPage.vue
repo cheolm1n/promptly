@@ -1,19 +1,19 @@
 <template>
   <div class="container" v-if="loaded">
-    <Textarea v-model="newPrompt" rows="3" cols="30" placeholder="새로운 프롬프트 입력" class="textarea"/>
+    <Textarea v-model="newPrompt" rows="3" cols="30" :placeholder="getMessage('addPromptLabelPlaceholder')" class="textarea" />
     <div class="button-group">
-      <Button label="프롬프트 추가" @click="addPrompt" class="add-button"/>
-      <Menu :model="menuItems" popup ref="menu"/>
-      <Button icon="pi pi-bars" class="hamburger-button" @click="$refs.menu.toggle($event)" aria-label="Menu"/>
+      <Button :label="getMessage('addPromptLabel')" @click="addPrompt" class="add-button" />
+      <Menu :model="menuItems" popup ref="menu" />
+      <Button icon="pi pi-bars" class="hamburger-button" @click="$refs.menu.toggle($event)" :aria-label="getMessage('menuLabel')" />
     </div>
 
-    <input type="file" ref="fileInput" @change="onFileChange" accept=".json" class="import-input"/>
+    <input type="file" ref="fileInput" @change="onFileChange" accept=".json" class="import-input" />
 
-    <Dialog header="프롬프트 가져오기" v-model:visible="dialogVisible" modal>
-      <p>기존 프롬프트를 덮어쓰시겠습니까, 아니면 뒤에 추가하시겠습니까?</p>
+    <Dialog :header="getMessage('importPromptLabel')" v-model:visible="dialogVisible" modal>
+      <p>{{ getMessage('overwriteConfirmationMessage') }}</p>
       <div class="dialog-actions">
-        <Button label="덮어쓰기" icon="pi pi-refresh" @click="overwritePrompts"/>
-        <Button label="새로 추가" icon="pi pi-plus" @click="appendPrompts"/>
+        <Button :label="getMessage('overwritePromptLabel')" icon="pi pi-refresh" @click="overwritePrompts" style="margin-right: 1rem"/>
+        <Button :label="getMessage('appendPromptLabel')" icon="pi pi-plus" @click="appendPrompts" />
       </div>
     </Dialog>
 
@@ -21,11 +21,10 @@
       <li v-for="(prompt, index) in prompts" :key="prompt.id" class="prompt-card" @mouseover="hoveredIndex = index" @mouseleave="hoveredIndex = -1">
         <div class="prompt-content">
           <div v-if="editingIndex === index" class="edit-mode">
-            <!-- 인라인 편집 모드 (Textarea 사용) -->
-            <Textarea v-model="editedPrompt" rows="3" class="input-edit" autoResize/>
+            <Textarea v-model="editedPrompt" rows="3" class="input-edit" autoResize />
             <div class="prompt-actions">
-              <Button icon="pi pi-check" class="save-button" @click="saveEditedPrompt(index)" aria-label="Save"/>
-              <Button icon="pi pi-times" class="cancel-button" @click="cancelEdit" aria-label="Cancel"/>
+              <Button icon="pi pi-check" class="save-button" @click="saveEditedPrompt(index)" :aria-label="getMessage('saveLabel')" />
+              <Button icon="pi pi-times" class="cancel-button" @click="cancelEdit" :aria-label="getMessage('cancelLabel')" />
             </div>
           </div>
           <div v-else class="view-mode">
@@ -35,11 +34,11 @@
                 <div class="prompt-actions-overlay" v-show="hoveredIndex === index">
                   <transition name="fade">
                     <div class="prompt-actions">
-                      <Button icon="pi pi-pencil" class="edit-button" @click="editPrompt(index)" aria-label="Edit"/>
-                      <Button icon="pi pi-copy" class="duplicate-button" @click="duplicatePrompt(index)" aria-label="Duplicate"/>
-                      <Button icon="pi pi-trash" class="delete-button" @click="deletePrompt(index)" aria-label="Delete"/>
-                      <Button icon="pi pi-arrow-up" class="move-up-button" @click="movePromptUp(index)" aria-label="Move Up" :disabled="index === 0"/>
-                      <Button icon="pi pi-arrow-down" class="move-down-button" @click="movePromptDown(index)" aria-label="Move Down" :disabled="index === prompts.length - 1"/>
+                      <Button icon="pi pi-pencil" class="edit-button" @click="editPrompt(index)" :aria-label="getMessage('editLabel')" />
+                      <Button icon="pi pi-copy" class="duplicate-button" @click="duplicatePrompt(index)" :aria-label="getMessage('duplicateLabel')" />
+                      <Button icon="pi pi-trash" class="delete-button" @click="deletePrompt(index)" :aria-label="getMessage('deleteLabel')" />
+                      <Button icon="pi pi-arrow-up" class="move-up-button" @click="movePromptUp(index)" :aria-label="getMessage('moveUpLabel')" :disabled="index === 0" />
+                      <Button icon="pi pi-arrow-down" class="move-down-button" @click="movePromptDown(index)" :aria-label="getMessage('moveDownLabel')" :disabled="index === prompts.length - 1" />
                     </div>
                   </transition>
                 </div>
@@ -51,7 +50,7 @@
     </transition-group>
   </div>
   <div v-else>
-    <p>로딩 중...</p>
+    <p>{{ getMessage('loadingMessage') }}</p>
   </div>
 </template>
 
@@ -61,6 +60,7 @@ import {useToast} from 'primevue/usetoast';
 import Menu from 'primevue/menu';
 import Dialog from 'primevue/dialog';
 import useChromeStorage from "../composables/useChromeStorage";
+import useI18n from "../composables/useI18n";
 
 export default {
   name: 'PromptManagementPage',
@@ -70,6 +70,7 @@ export default {
   },
   setup() {
     const storage = useChromeStorage();
+    const { getMessage } = useI18n();
     const newPrompt = ref('');
     const editedPrompt = ref('');
     const editingIndex = ref(-1);
@@ -89,16 +90,16 @@ export default {
         id: Date.now() + idx,
         text,
       }));
-    })
+    });
 
     const menuItems = [
       {
-        label: '프롬프트 내보내기',
+        label: getMessage('exportPrompt'),
         icon: 'pi pi-download',
         command: () => exportPrompts(),
       },
       {
-        label: '프롬프트 가져오기',
+        label: getMessage('importPrompt'),
         icon: 'pi pi-upload',
         command: () => fileInput.value.click(),
       },
@@ -108,7 +109,7 @@ export default {
       if (newPrompt.value.trim()) {
         const newId = Date.now();
         prompts.value.push({id: newId, text: newPrompt.value.trim()});
-        updateStorePrompts('프롬프트가 추가되었습니다.');
+        updateStorePrompts(getMessage('addPromptMessage'));
         newPrompt.value = '';
       }
     };
@@ -121,8 +122,8 @@ export default {
     const saveEditedPrompt = (index) => {
       if (editingIndex.value > -1 && editedPrompt.value.trim()) {
         prompts.value[index].text = editedPrompt.value;
-        updateStorePrompts('프롬프트가 수정되었습니다.');
         editingIndex.value = -1; // 편집 모드 종료
+        updateStorePrompts(getMessage('updatePromptMessage'));
       }
     };
 
@@ -133,13 +134,13 @@ export default {
 
     const deletePrompt = (index) => {
       prompts.value.splice(index, 1);
-      updateStorePrompts('프롬프트가 삭제되었습니다.');
+      updateStorePrompts(getMessage('deletePromptMessage'));
     };
 
     const duplicatePrompt = (index) => {
       const promptToDuplicate = {...prompts.value[index], id: Date.now()};
       prompts.value.splice(index + 1, 0, promptToDuplicate); // 선택한 프롬프트 복제 후 바로 다음 위치에 삽입
-      updateStorePrompts('프롬프트가 복제되었습니다.');
+      updateStorePrompts(getMessage('duplicatePromptMessage'));
     };
 
     const exportPrompts = () => {
@@ -176,8 +177,8 @@ export default {
           } catch (error) {
             toast.add({
               severity: 'error',
-              summary: '오류',
-              detail: '유효하지 않은 JSON 형식입니다.',
+              summary: getMessage('error'),
+              detail: getMessage('jsonValidationErrorMessage'),
               life: 1000,
             });
           }
@@ -193,7 +194,7 @@ export default {
         id: Date.now() + idx,
         text,
       }));
-      updateStorePrompts('프롬프트가 덮어쓰여졌습니다.');
+      updateStorePrompts(getMessage('overwritePromptMessage'));
       dialogVisible.value = false;
     };
 
@@ -203,7 +204,7 @@ export default {
         text,
       }));
       prompts.value.push(...newPrompts);
-      updateStorePrompts('프롬프트가 추가되었습니다.');
+      updateStorePrompts(getMessage('appendPromptMessage'));
       dialogVisible.value = false;
     };
 
@@ -227,7 +228,7 @@ export default {
         if (message) {
           toast.add({
             severity: 'success',
-            summary: '성공',
+            summary: getMessage('success'),
             detail: message,
             life: 1000,
           });
@@ -257,7 +258,8 @@ export default {
       movePromptUp,
       movePromptDown,
       hoveredIndex,
-      loaded: storage.loaded
+      loaded: storage.loaded,
+      getMessage
     };
   },
 };

@@ -45,7 +45,7 @@ AI 모델을 활용해 작업할 때 자주 사용되는 프롬프트를 관리�
 - [x] 저장된 프롬프트의 export, import 기능
 - [x] 저장된 프롬프트의 순서 변경
 - [x] 첫 사용자를 위한 샘플 추가
-- [ ] 영문화 or 다국어화 (+ 개인 설정 추가)
+- [x] 영문화 or 다국어화 (+ 개인 설정 추가)
 - [x] primevue 버전 최신화
 - [x] manage 페이지의 tab-content 영역의 가로 너비 확장
 - [x] main 페이지에서 드롭다운위로 마우스 이동시 전체 요소가 왼쪽으로 이동하는 문제
@@ -58,6 +58,8 @@ AI 모델을 활용해 작업할 때 자주 사용되는 프롬프트를 관리�
 - [x] storage.js를 composable로 교체
 - [x] 라이트/다크 모드 지원 
 - [x] 아이콘 교체
+- [ ] 조합된 프롬프트가 URL 한계 길이를 벗어날 때 경고 추가
+- [ ] 저장된 프롬프트의 길이가 chrome.storage.sync의 한계를 벗어 날 때 저장/복제 되지 않고 에러를 띄우도록 수정
 
 ## 만든이
 - 개발: [![GitHub Badge](https://img.shields.io/badge/-cheolm1n-181717?style=flat-square&logo=github&logoColor=white&link=https://github.com/cheolm1n)](https://github.com/cheolm1n) [![GitHub Badge](https://img.shields.io/badge/-jongwoo328-181717?style=flat-square&logo=github&logoColor=white&link=https://github.com/jongwoo328)](https://github.com/jongwoo328)

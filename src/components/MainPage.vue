@@ -78,7 +78,7 @@
 import {computed, reactive, ref, watch, onMounted} from 'vue';
 import {useToast} from 'primevue/usetoast';
 import useChromeStorage from "../composables/useChromeStorage";
-import useI18n from "../composables/useI18n";
+import useI18n from "../composables/useChromeI18n";
 
 export default {
   name: 'MainPage',

@@ -60,7 +60,7 @@ import {useToast} from 'primevue/usetoast';
 import Menu from 'primevue/menu';
 import Dialog from 'primevue/dialog';
 import useChromeStorage from "../composables/useChromeStorage";
-import useI18n from "../composables/useI18n";
+import useI18n from "../composables/useChromeI18n";
 
 export default {
   name: 'PromptManagementPage',

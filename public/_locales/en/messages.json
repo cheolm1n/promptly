@@ -30,7 +30,7 @@
         "message": "Import Prompt(s)"
     },
     "overwritePromptLabel": {
-        "message": "Overwrite Prompt(s)"
+        "message": "Overwrite"
     },
     "copyToClipboardSuccessMessage": {
         "message": "Prompt has been copied to clipboard."
@@ -39,7 +39,7 @@
         "message": "Prompt has been copied to clipboard."
     },
     "appendPromptLabel": {
-        "message": "Add New"
+        "message": "Append"
     },
     "saveLabel": {
         "message": "Save"

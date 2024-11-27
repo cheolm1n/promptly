@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import path from 'path';
+import webExtension from "vite-plugin-web-extension"
 
 export default defineConfig({
   plugins: [
@@ -12,7 +13,8 @@ export default defineConfig({
           injectScript: `<script src="./your-inline-script.js"></script>`
         }
       }
-    })
+    }),
+  webExtension()
   ],
   resolve: {
     alias: {

@@ -42,7 +42,7 @@ export default function useChromeStorage() {
                     if (isFirstUse) {
                         // 첫 사용이고 저장된 프롬프트가 없을 경우 기본 예제 추가
                         let defaultPrompts;
-                        if (getLocale() === "ko-KR") {
+                        if (getLocale() === "ko" || getLocale() === "ko-KR") {
                             defaultPrompts = [
                                 "(샘플) 다음 텍스트를 {언어}로 번역해주세요:\n{텍스트}",
                                 "(샘플) {문제 상황}에서 {선택지1}, {선택지2} 중 하나를 선택하는 데 도움을 주세요. 각 선택의 장단점을 비교해주세요.",

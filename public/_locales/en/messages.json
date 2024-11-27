@@ -6,7 +6,7 @@
         "message": "Input"
     },
     "viewResultLabel": {
-        "message": "Prompt Combination"
+        "message": "Combine Prompt"
     },
     "resultLabel": {
         "message": "Result"
@@ -18,10 +18,10 @@
         "message": "Copy"
     },
     "addPromptLabelPlaceholder": {
-        "message": "Try writing a new prompt including {variable}!"
+        "message": "Create a new prompt with {variable}!"
     },
     "addPromptLabel": {
-        "message": "Add Prompt"
+        "message": "Create Prompt"
     },
     "menuLabel": {
         "message": "Menu"

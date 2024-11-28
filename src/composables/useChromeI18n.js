@@ -1,15 +1,25 @@
 import { ref } from 'vue';
+import en from '../../public/_locales/en/messages.json'
+import ko from '../../public/_locales/ko/messages.json'
 
 export default function useI18n() {
   const isChromeI18nAvailable = ref(typeof window.chrome !== 'undefined' && window.chrome.i18n !== undefined);
 
+  function getLocaleFile(lang) {
+    switch (lang) {
+      case 'ko':
+      case 'ko-KR':
+        return ko;
+      default:
+        return en;
+    }
+  }
+
   function getMessage(key) {
-    if (isChromeI18nAvailable) {
-      // 프로덕션 환경에서는 chrome.i18n 메시지 사용
+    if (isChromeI18nAvailable.value) {
       return chrome.i18n.getMessage(key);
     } else {
-      // FIXME 개발 환경에서는 어떡하지...  
-      return chrome.i18n.getMessage(key);
+      return getLocaleFile(navigator.language)[key].message
     }
   };
 
@@ -26,4 +36,4 @@ export default function useI18n() {
     getMessage,
     getLocale,
   };
-} 
+}

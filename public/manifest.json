@@ -15,5 +15,6 @@
   "permissions": ["storage"],
   "icons": {
     "128": "icons/appicon_blue_128.png"
-  }
+  },
+  "default_locale": "en"
 }

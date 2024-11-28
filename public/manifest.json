@@ -16,6 +16,5 @@
   "icons": {
     "128": "icons/appicon_blue_128.png"
   },
-  "host_permissions": ["https://chat.openai.com/*"],
   "default_locale": "en"
 }

@@ -24,7 +24,7 @@ export default function useI18n() {
   };
 
   function getLocale() {
-    if (isChromeI18nAvailable) {
+    if (isChromeI18nAvailable.value) {
       return chrome.i18n.getUILanguage();
     } else {
       // Local 개발 환경에서는 한국어 사용

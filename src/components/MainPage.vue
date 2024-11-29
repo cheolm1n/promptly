@@ -123,8 +123,20 @@ export default {
 
     // 모델 선택 함수
     const selectModel = (model) => {
-      selectedModel.value = model;
-      storage.set({selectedModel: model});
+      storage.set({selectedModel: model}, () => {
+        if (chrome.runtime.lastError) {
+          // 실패
+          toast.add({
+            severity: 'error',
+            summary: getMessage('error'),
+            detail: getMessage('storageSyncErrorMessage'),
+            life: 2000,
+          })
+        } else {
+          // 성공
+          selectedModel.value = model;
+        }
+      });
     };
 
     // 모델의 라벨을 가져오는 함수

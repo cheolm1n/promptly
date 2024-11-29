@@ -97,5 +97,8 @@
     },
     "loadingMessage": {
         "message": "불러오는 중..."
+    },
+    "storageSyncErrorMessage": {
+        "message": "저장 용량을 초과하여 저장할 수 없습니다. 프롬프트의 길이 또는 개수를 줄여주세요."
     }
 }

@@ -222,16 +222,27 @@ export default {
       }
     };
 
-    const updateStorePrompts = (message) => {
-      storage.prompts.value = prompts.value.map((prompt) => prompt.text);
+    const updateStorePrompts = async (message) => {
       storage.set({prompts: storage.prompts.value}, () => {
-        if (message) {
+        if (chrome.runtime.lastError) {
+          // 실패
           toast.add({
-            severity: 'success',
-            summary: getMessage('success'),
-            detail: message,
-            life: 1000,
-          });
+            severity: 'error',
+            summary: getMessage('error'),
+            detail: getMessage('storageSyncErrorMessage'),
+            life: 2000,
+          })
+        } else {
+          // 성공
+          storage.prompts.value = prompts.value.map((prompt) => prompt.text);
+          if (message) {
+            toast.add({
+              severity: 'success',
+              summary: getMessage('success'),
+              detail: message,
+              life: 1000,
+            });
+          }
         }
       });
     };

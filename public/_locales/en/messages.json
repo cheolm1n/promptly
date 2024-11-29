@@ -97,5 +97,8 @@
     },
     "loadingMessage": {
         "message": "Loading..."
+    },
+    "storageSyncErrorMessage": {
+        "message": "Storage capacity has been exceeded, please reduce the length or number of prompts."
     }
 }

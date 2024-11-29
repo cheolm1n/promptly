@@ -3,7 +3,7 @@ import en from '../../public/_locales/en/messages.json'
 import ko from '../../public/_locales/ko/messages.json'
 
 export default function useI18n() {
-  const isChromeI18nAvailable = ref(typeof window.chrome !== 'undefined' && window.chrome.i18n !== undefined);
+  const isChromeI18nAvailable = ref(typeof chrome !== 'undefined' && chrome.i18n !== undefined);
 
   function getLocaleFile(lang) {
     switch (lang) {

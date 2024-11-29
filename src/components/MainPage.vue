@@ -40,6 +40,9 @@
     <div v-if="filledPrompt" class="p-mt-3">
       <p><strong>{{ getMessage('resultLabel') }}:</strong></p>
       <pre class="result-block">{{ filledPrompt }}</pre>
+      <Message :pt="{text: {style: {whiteSpace: 'break-spaces'}}}" v-if="urlLengthAlert" severity="warn">
+        {{getMessage('urlLengthWarnMessage')}}
+      </Message>
       <div class="button-container">
         <SplitButton
             icon="pi pi-external-link"
@@ -79,6 +82,7 @@ import {computed, reactive, ref, watch, onMounted} from 'vue';
 import {useToast} from 'primevue/usetoast';
 import useChromeStorage from "../composables/useChromeStorage";
 import useI18n from "../composables/useChromeI18n";
+import {getStringBytes} from "../utils/stringUtils";
 
 export default {
   name: 'MainPage',
@@ -91,6 +95,7 @@ export default {
     const userInputs = reactive({});
     const filledPrompt = ref('');
     const selectedModel = ref('gpt-4'); // 기본 값 설정
+    const urlLengthAlert = ref(false);
 
     // 모델 옵션들
     const modelOptions = [
@@ -181,6 +186,7 @@ export default {
           );
         });
         filledPrompt.value = tempPrompt;
+        urlLengthAlert.value = getStringBytes(tempPrompt) >= 8000;
       }
     };
 
@@ -235,6 +241,7 @@ export default {
       getButtonClass,
       getModelLabel,
       getMessage,
+      urlLengthAlert
     };
   },
 };
@@ -324,7 +331,7 @@ export default {
   padding-left: .75rem;
 }
 
-:deep(.p-select-overlay){
+:deep(.p-select-overlay) {
   width: 100% !important;
 }
 

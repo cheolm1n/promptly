@@ -222,8 +222,9 @@ export default {
       }
     };
 
-    const updateStorePrompts = async (message) => {
-      storage.set({prompts: storage.prompts.value}, () => {
+    const updateStorePrompts = (message) => {
+      const newPrompts = prompts.value.map((prompt) => prompt.text);
+      storage.set({prompts: newPrompts}, () => {
         if (chrome.runtime.lastError) {
           // 실패
           toast.add({
@@ -234,7 +235,7 @@ export default {
           })
         } else {
           // 성공
-          storage.prompts.value = prompts.value.map((prompt) => prompt.text);
+          storage.prompts.value = newPrompts
           if (message) {
             toast.add({
               severity: 'success',

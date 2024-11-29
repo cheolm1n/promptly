@@ -40,7 +40,7 @@
     <div v-if="filledPrompt" class="p-mt-3">
       <p><strong>{{ getMessage('resultLabel') }}:</strong></p>
       <pre class="result-block">{{ filledPrompt }}</pre>
-      <Message v-if="urlLengthAlert" severity="warn">
+      <Message :pt="{text: {style: {whiteSpace: 'break-spaces'}}}" v-if="urlLengthAlert" severity="warn">
         {{getMessage('urlLengthWarnMessage')}}
       </Message>
       <div class="button-container">

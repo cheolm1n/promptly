@@ -269,14 +269,12 @@ export default {
 
 .textarea {
   width: 100%;
-  max-width: 600px;
 }
 
 .button-group {
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 600px;
   margin-top: 0.5em;
   position: relative;
 }
@@ -309,7 +307,6 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 600px;
   gap: 1em;
   list-style: none;
   padding: 0;

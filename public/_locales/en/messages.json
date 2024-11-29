@@ -97,5 +97,8 @@
     },
     "loadingMessage": {
         "message": "Loading..."
+    },
+    "urlLengthWarnMessage": {
+        "message": "The prompt is too long. Depending on your environment, the behavior might not be correct."
     }
 }

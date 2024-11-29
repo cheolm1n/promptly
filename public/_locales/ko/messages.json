@@ -29,7 +29,7 @@
     "importPromptLabel": {
         "message": "프롬프트 가져오기"
     },
-    "overwritePromptMessage": {
+    "overwriteConfirmationMessage": {
         "message": "가져온 프롬프트를 기존 프롬프트에 어떻게 적용할지 선택해주세요."
     },
     "overwritePromptLabel": {

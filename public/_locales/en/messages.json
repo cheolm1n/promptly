@@ -29,7 +29,7 @@
     "importPromptLabel": {
         "message": "Import Prompt(s)"
     },
-    "overwritePromptMessage": {
+    "overwriteConfirmationMessage": {
         "message": "Please choose how you'd like to apply the imported prompt to the existing one:"
     },
     "overwritePromptLabel": {

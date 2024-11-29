@@ -10,7 +10,6 @@
           style="width: 100%; margin-bottom: 1rem;"
           append-to="self"
       />
-
       <div v-if="variables.length" class="variables-container">
         <div
             v-for="(variable, index) in variables"
@@ -18,13 +17,12 @@
             class="p-field variable-field"
         >
           <label :for="'var_' + index">{{ variable }} {{ getMessage('inputLabel') }}:</label>
-          <component
-              :is="userInputs[variable].length > 50 ? 'Textarea' : 'InputText'"
+          <Textarea
               v-model="userInputs[variable]"
               :id="'var_' + index"
-              :rows="userInputs[variable].length > 50 ? 3 : 1"
-              autoResize
               class="variable-input"
+              autoResize
+              rows="1"
           />
         </div>
       </div>
@@ -159,7 +157,7 @@ export default {
       if (newPrompt) {
         const varMatches = newPrompt.match(/{(.*?)}/g);
         variables.value = varMatches
-            ? varMatches.map((v) => v.replace(/[{}]/g, ''))
+            ? [...new Set(varMatches.map((v) => v.replace(/[{}]/g, '')))]
             : [];
         variables.value.forEach((variable) => {
           userInputs[variable] = '';
@@ -254,6 +252,9 @@ export default {
 
 .variable-input {
   width: 100%;
+  line-height: 1.5em;
+  overflow-y: auto !important;
+  max-height: calc(1.5em * 3);
 }
 
 .dropdown-container {

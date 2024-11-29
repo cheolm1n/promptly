@@ -99,6 +99,6 @@
         "message": "Loading..."
     },
     "urlLengthWarnMessage": {
-        "message": "The prompt is too long. Depending on your environment, the behavior might not be correct."
+        "message": "The prompt is too long. Behavior may not be correct depending on browser environment, model type, etc."
     }
 }

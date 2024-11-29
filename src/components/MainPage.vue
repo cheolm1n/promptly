@@ -186,7 +186,7 @@ export default {
           );
         });
         filledPrompt.value = tempPrompt;
-        urlLengthAlert.value = getStringBytes(tempPrompt) >= 9000;
+        urlLengthAlert.value = getStringBytes(tempPrompt) >= 8000;
       }
     };
 

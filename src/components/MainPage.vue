@@ -153,7 +153,7 @@ export default {
       if (newPrompt) {
         const varMatches = newPrompt.match(/{(.*?)}/g);
         variables.value = varMatches
-            ? varMatches.map((v) => v.replace(/[{}]/g, ''))
+            ? [...new Set(varMatches.map((v) => v.replace(/[{}]/g, '')))]
             : [];
         variables.value.forEach((variable) => {
           userInputs[variable] = '';

@@ -1,5 +1,6 @@
 # Promptly
-## 개요
+![App Icon](./public/icons/appicon_blue_128.png)
+
 Promptly는 사용자가 프롬프트 템플릿을 쉽게 관리하여 ChatGPT를 더 쉽게 사용 할 수 있도록 돕는 Chrome 확장 프로그램입니다. 
 
 langchain의 PromptTemplate이 제공해주는 편의성을 프로그래밍이 아닌 일반적인 사용에서도 누리고 싶어 만들었습니다.   
@@ -65,3 +66,8 @@ AI 모델을 활용해 작업할 때 자주 사용되는 프롬프트를 관리�
 ## 만든이
 - 개발: [![GitHub Badge](https://img.shields.io/badge/-cheolm1n-181717?style=flat-square&logo=github&logoColor=white&link=https://github.com/cheolm1n)](https://github.com/cheolm1n) [![GitHub Badge](https://img.shields.io/badge/-jongwoo328-181717?style=flat-square&logo=github&logoColor=white&link=https://github.com/jongwoo328)](https://github.com/jongwoo328)
 - 아이콘 디자인: [![Instagram Badge](https://img.shields.io/badge/-su.roo0v0-E4405F?style=flat-square&logo=Instagram&logoColor=white&link=https://www.instagram.com/su.roo0v0)](https://www.instagram.com/su.roo0v0)
+
+## 후원
+본 확장 프로그램이 도움이 되셨다면 개발자에게 띠뜻한 커피로 마음을 전해보세요! 
+
+[![Buy Me a Coffee](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzRjcG5mMnNmbmZ2cThieTZrejIyeTBxNDh4eW1va2psbzczZGppbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/hXMGQqJFlIQMOjpsKC/giphy.webp)](https://buymeacoffee.com/cheolm1nde8)

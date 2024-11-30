@@ -107,9 +107,17 @@ export default {
 
     const addPrompt = () => {
       if (newPrompt.value.trim()) {
-        const newId = Date.now();
-        prompts.value.push({id: newId, text: newPrompt.value.trim()});
-        updateStorePrompts(getMessage('addPromptMessage'));
+        const newPromptObj = { id: Date.now(), text: newPrompt.value.trim() };
+        const newPrompts = prompts.value.concat(newPromptObj);
+
+        updateStorePrompts(newPrompts, getMessage('addPromptMessage'))
+            .then(() => {
+              prompts.value.push(newPromptObj);
+              console.log('Prompt added successfully');
+            })
+            .catch((error) => {
+              console.error('Failed to add prompt:', error);
+            });
         newPrompt.value = '';
       }
     };
@@ -121,9 +129,19 @@ export default {
 
     const saveEditedPrompt = (index) => {
       if (editingIndex.value > -1 && editedPrompt.value.trim()) {
-        prompts.value[index].text = editedPrompt.value;
-        editingIndex.value = -1; // 편집 모드 종료
-        updateStorePrompts(getMessage('updatePromptMessage'));
+        const updatedPrompt = { ...prompts.value[index], text: editedPrompt.value.trim() };
+        const newPrompts = prompts.value.slice();
+        newPrompts.splice(index, 1, updatedPrompt);
+
+        updateStorePrompts(newPrompts, getMessage('updatePromptMessage'))
+            .then(() => {
+              prompts.value[index].text = editedPrompt.value.trim();
+              editingIndex.value = -1;
+              console.log('Prompt updated successfully');
+            })
+            .catch((error) => {
+              console.error('Failed to update prompt:', error);
+            });
       }
     };
 
@@ -133,14 +151,32 @@ export default {
     };
 
     const deletePrompt = (index) => {
-      prompts.value.splice(index, 1);
-      updateStorePrompts(getMessage('deletePromptMessage'));
+      const newPrompts = prompts.value.slice();
+      newPrompts.splice(index, 1);
+
+      updateStorePrompts(newPrompts, getMessage('deletePromptMessage'))
+          .then(() => {
+            prompts.value.splice(index, 1);
+            console.log('Prompt deleted successfully');
+          })
+          .catch((error) => {
+            console.error('Failed to delete prompt:', error);
+          });
     };
 
     const duplicatePrompt = (index) => {
-      const promptToDuplicate = {...prompts.value[index], id: Date.now()};
-      prompts.value.splice(index + 1, 0, promptToDuplicate); // 선택한 프롬프트 복제 후 바로 다음 위치에 삽입
-      updateStorePrompts(getMessage('duplicatePromptMessage'));
+      const promptToDuplicate = { id: Date.now(), text: prompts.value[index].text };
+      const newPrompts = prompts.value.slice();
+      newPrompts.splice(index + 1, 0, promptToDuplicate);
+
+      updateStorePrompts(newPrompts, getMessage('duplicatePromptMessage'))
+          .then(() => {
+            prompts.value.splice(index + 1, 0, promptToDuplicate);
+            console.log('Prompt duplicated successfully');
+          })
+          .catch((error) => {
+            console.error('Failed to duplicate prompt:', error);
+          });
     };
 
     const exportPrompts = () => {
@@ -179,7 +215,7 @@ export default {
               severity: 'error',
               summary: getMessage('error'),
               detail: getMessage('jsonValidationErrorMessage'),
-              life: 1000,
+              life: 5000,
             });
           }
         };
@@ -190,62 +226,95 @@ export default {
     };
 
     const overwritePrompts = () => {
-      prompts.value = importedPrompts.value.map((text, idx) => ({
+      const newPrompts = importedPrompts.value.map((text, idx) => ({
         id: Date.now() + idx,
         text,
       }));
-      updateStorePrompts(getMessage('overwritePromptMessage'));
+
+      updateStorePrompts(newPrompts, getMessage('overwritePromptMessage'))
+          .then(() => {
+            prompts.value = newPrompts;
+            console.log('Prompts overwritten successfully');
+          })
+          .catch((error) => {
+            console.error('Failed to overwrite prompts:', error);
+          });
       dialogVisible.value = false;
     };
 
     const appendPrompts = () => {
-      const newPrompts = importedPrompts.value.map((text, idx) => ({
+      const importedWithIds = importedPrompts.value.map((text, idx) => ({
         id: Date.now() + prompts.value.length + idx,
         text,
       }));
-      prompts.value.push(...newPrompts);
-      updateStorePrompts(getMessage('appendPromptMessage'));
+      const newPrompts = prompts.value.concat(importedWithIds);
+
+      updateStorePrompts(newPrompts, getMessage('appendPromptMessage'))
+          .then(() => {
+            prompts.value = newPrompts;
+            console.log('Prompts appended successfully');
+          })
+          .catch((error) => {
+            console.error('Failed to append prompts:', error);
+          });
       dialogVisible.value = false;
     };
 
     const movePromptUp = (index) => {
       if (index > 0) {
-        prompts.value.splice(index - 1, 2, prompts.value[index], prompts.value[index - 1]);
-        updateStorePrompts();
+        const newPrompts = prompts.value.slice();
+        [newPrompts[index - 1], newPrompts[index]] = [newPrompts[index], newPrompts[index - 1]];
+
+        updateStorePrompts(newPrompts)
+            .then(() => {
+              [prompts.value[index - 1], prompts.value[index]] = [prompts.value[index], prompts.value[index - 1]];
+              console.log('Prompt moved up successfully');
+            })
+            .catch((error) => {
+              console.error('Failed to move prompt up:', error);
+            });
       }
     };
 
     const movePromptDown = (index) => {
       if (index < prompts.value.length - 1) {
-        prompts.value.splice(index, 2, prompts.value[index + 1], prompts.value[index]);
-        updateStorePrompts();
+        const newPrompts = prompts.value.slice();
+        [newPrompts[index], newPrompts[index + 1]] = [newPrompts[index + 1], newPrompts[index]];
+
+        updateStorePrompts(newPrompts)
+            .then(() => {
+              [prompts.value[index], prompts.value[index + 1]] = [prompts.value[index + 1], prompts.value[index]];
+              console.log('Prompt moved down successfully');
+            })
+            .catch((error) => {
+              console.error('Failed to move prompt down:', error);
+            });
       }
     };
 
-    const updateStorePrompts = (message) => {
-      const newPrompts = prompts.value.map((prompt) => prompt.text);
-      storage.set({prompts: newPrompts}, () => {
-        if (chrome.runtime.lastError) {
-          // 실패
+    const updateStorePrompts = async (newPrompts, message) => {
+      const promptsTexts = newPrompts.map((prompt) => prompt.text);
+      try {
+        await storage.set({prompts: promptsTexts});
+        storage.prompts.value = promptsTexts;
+        if (message) {
           toast.add({
-            severity: 'error',
-            summary: getMessage('error'),
-            detail: getMessage('storageSyncErrorMessage'),
-            life: 2000,
-          })
-        } else {
-          // 성공
-          storage.prompts.value = newPrompts
-          if (message) {
-            toast.add({
-              severity: 'success',
-              summary: getMessage('success'),
-              detail: message,
-              life: 1000,
-            });
-          }
+            severity: 'success',
+            summary: getMessage('success'),
+            detail: message,
+            life: 1000,
+          });
         }
-      });
+      } catch (error) {
+        console.error('Storage set error:', error);
+        toast.add({
+          severity: 'error',
+          summary: getMessage('error'),
+          detail: getMessage('storageSyncErrorMessage'),
+          life: 5000,
+        });
+        throw error;
+      }
     };
 
     return {
@@ -271,7 +340,7 @@ export default {
       movePromptDown,
       hoveredIndex,
       loaded: storage.loaded,
-      getMessage
+      getMessage,
     };
   },
 };
@@ -296,14 +365,11 @@ export default {
 .add-button {
   flex-grow: 1;
   height: 2.5em;
-  /* 버튼 높이 설정 */
 }
 
 .hamburger-button {
   width: 2.5em;
-  /* 버튼 너비 설정 */
   height: 2.5em;
-  /* 버튼 높이 설정 */
   margin-left: 0.5em;
 }
 

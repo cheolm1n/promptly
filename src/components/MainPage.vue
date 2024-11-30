@@ -109,7 +109,7 @@ export default {
       {label: 'Perplexity', model: 'Perplexity'},
     ].map(option => ({
       ...option,
-      command: () => selectModel(option.model) // command를 동적으로 생성
+      command: () => selectModel(option.model), // command를 동적으로 생성
     }));
 
     // 버튼 클래스 계산
@@ -126,8 +126,19 @@ export default {
 
     // 모델 선택 함수
     const selectModel = (model) => {
-      selectedModel.value = model;
-      storage.set({selectedModel: model});
+      storage.set({ selectedModel: model })
+          .then(() => {
+            selectedModel.value = model;
+          })
+          .catch((error) => {
+            console.error('Failed to save selected model:', error);
+            toast.add({
+              severity: 'error',
+              summary: getMessage('error'),
+              detail: getMessage('storageSyncErrorMessage'),
+              life: 5000,
+            });
+          });
     };
 
     // 모델의 라벨을 가져오는 함수
@@ -138,11 +149,15 @@ export default {
 
     // 컴포넌트가 마운트될 때 모델을 스토리지에서 불러옴
     onMounted(() => {
-      storage.get('selectedModel', (data) => {
-        if (data.selectedModel) {
-          selectedModel.value = data.selectedModel;
-        }
-      });
+      storage.get('selectedModel')
+          .then((data) => {
+            if (data.selectedModel) {
+              selectedModel.value = data.selectedModel;
+            }
+          })
+          .catch((error) => {
+            console.error('Failed to load selected model:', error);
+          });
     });
 
     const prompts = computed(() => {
@@ -220,7 +235,7 @@ export default {
           severity: 'error',
           summary: getMessage('error'),
           detail: getMessage('copyToClipboardErrorMessage'),
-          life: 1000,
+          life: 5000,
         });
       }
     };
@@ -239,7 +254,7 @@ export default {
       getButtonClass,
       getModelLabel,
       getMessage,
-      urlLengthAlert
+      urlLengthAlert,
     };
   },
 };

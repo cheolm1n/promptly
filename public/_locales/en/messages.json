@@ -103,5 +103,8 @@
     },
     "urlLengthWarnMessage": {
         "message": "The prompt is too long and may not function properly depending on the browser environment or model type.\n\nIf an issue occurs, please click the copy button to copy the prompt to your clipboard and paste it for use."
+    },
+    "storageSyncErrorMessage": {
+        "message": "Storage capacity has been exceeded, please reduce the length or number of prompts."
     }
 }

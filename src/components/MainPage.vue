@@ -138,7 +138,7 @@ export default {
               severity: 'error',
               summary: getMessage('error'),
               detail: getMessage('storageSyncErrorMessage'),
-              life: 2000,
+              life: 5000,
             });
           });
     };

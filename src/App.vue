@@ -1,22 +1,26 @@
 <template>
-  <div id="app">
-    <Toast />
-    <div class="tab-header">
-      <Button
-          label="MAIN"
-          @click="activeTab = 'main'"
-          :class="{'p-button-text': true, 'active': activeTab === 'main'}"
-      />
-      <Button
-          label="MANAGE"
-          @click="activeTab = 'manage'"
-          :class="{'p-button-text': true, 'active': activeTab === 'manage'}"
-      />
+  <Toast position="top-center" class="promptly-toast" />
+  <div class="custom-tabmenu">
+    <div
+      class="tab-item"
+      :class="{ active: activeIndex === 0 }"
+      @click="activeIndex = 0"
+    >
+      <i class="pi pi-home icon-spacing"></i>
+      <span>MAIN</span>
     </div>
-    <div class="tab-content">
-      <MainPage v-if="activeTab === 'main'" />
-      <PromptManagementPage v-else />
+    <div
+      class="tab-item"
+      :class="{ active: activeIndex === 1 }"
+      @click="activeIndex = 1"
+    >
+      <i class="pi pi-pencil icon-spacing"></i>
+      <span>MANAGE</span>
     </div>
+  </div>
+  <div class="tab-content">
+    <MainPage v-if="activeIndex === 0" />
+    <PromptManagementPage v-else />
   </div>
 </template>
 
@@ -32,50 +36,64 @@ export default {
   },
   data() {
     return {
-      activeTab: 'main',
+      activeIndex: 0,
     };
   },
 };
 </script>
 
 <style>
+@import 'primeicons/primeicons.css';
+
 #app {
-  min-width: 400px;
   min-height: 600px;
-  width: 100%;
-  height: 100%;
+  width: 400px;
   overflow: hidden;
   position: relative;
 }
 
-/* 탭 헤더 스타일 */
-.tab-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: white;
-  z-index: 1;
+.promptly-toast {
+  --p-toast-width: 90%;
+}
+
+.custom-tabmenu {
   display: flex;
-  justify-content: space-around;
-  padding: 10px 0;
-  border-bottom: 1px solid #ccc;
+  width: 100%;
+  cursor: pointer;
 }
 
-/* 탭 콘텐츠 영역 */
-.tab-content {
-  position: absolute;
-  top: 60px; /* 헤더의 높이만큼 아래로 */
-  bottom: 0;
-  left: 0;
-  right: 0;
-  overflow-y: auto;
+.tab-item {
+  flex: 1;
   padding: 10px;
+  text-align: center;
+  color: var(--p-button-text-primary-color);
+  border-bottom: 2px solid transparent;
+  opacity: 0.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 선택된 탭 버튼 스타일 */
-.tab-header .active {
-  font-weight: bold;
-  border-bottom: 2px solid #007ad9;
+.tab-item i {
+  display: flex;
+  align-items: center;
+}
+
+.tab-item span {
+  padding-top: 2px;
+}
+
+.tab-item.active {
+  color: var(--p-button-text-primary-color);
+  border-bottom: 2px solid var(--p-button-text-primary-color);
+  opacity: 1;
+}
+
+.icon-spacing {
+  margin-right: 8px;
+}
+
+.tab-content {
+  padding: 10px;
 }
 </style>

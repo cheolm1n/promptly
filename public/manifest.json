@@ -1,17 +1,20 @@
 {
   "manifest_version": 3,
   "name": "promptly",
-  "version": "1.0",
-  "description": "프롬프트 템플릿을 관리하고 ChatGPT에 전달하는 크롬 확장 프로그램입니다.",
+  "version": "1.0.0",
+  "description": "A Chrome extension for managing prompt templates and delivering them to AI services.",
   "action": {
     "default_popup": "index.html",
     "default_icon": {
-      "128": "icons/icon128.png"
+      "16": "icons/appicon_blue_16.png",
+      "32": "icons/appicon_blue_32.png",
+      "64": "icons/appicon_blue_64.png",
+      "128": "icons/appicon_blue_128.png"
     }
   },
   "permissions": ["storage"],
   "icons": {
-    "128": "icons/icon128.png"
+    "128": "icons/appicon_blue_128.png"
   },
-  "host_permissions": ["https://chat.openai.com/*"]
+  "default_locale": "en"
 }

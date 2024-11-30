@@ -1,0 +1,110 @@
+{
+    "selectPromptLabel": {
+        "message": "프롬프트를 선택하세요."
+    },
+    "inputLabel": {
+        "message": "입력"
+    },
+    "viewResultLabel": {
+        "message": "프롬프트 조합"
+    },
+    "resultLabel": {
+        "message": "결과"
+    },
+    "chatWithLabel": {
+        "message": "Chat with"
+    },
+    "copyLabel": {
+        "message": "복사"
+    },
+    "addPromptLabelPlaceholder": {
+        "message": "{변수}를 포함해 새 프롬프트를 작성해보세요!"
+    },
+    "addPromptLabel": {
+        "message": "프롬프트 추가"
+    },
+    "menuLabel": {
+        "message": "메뉴"
+    },
+    "importPromptLabel": {
+        "message": "프롬프트 가져오기"
+    },
+    "overwriteConfirmationMessage": {
+        "message": "가져온 프롬프트를 기존 프롬프트에 어떻게 적용할지 선택해주세요."
+    },
+    "overwritePromptLabel": {
+        "message": "프롬프트 덮어쓰기"
+    },
+    "copyToClipboardSuccessMessage": {
+        "message": "프롬프트가 클립보드에 복사되었습니다."
+    },
+    "copyToClipboardErrorMessage": {
+        "message": "프롬프트가 클립보드에 복사되었습니다."
+    },
+    "appendPromptLabel": {
+        "message": "새로 추가"
+    },
+    "saveLabel": {
+        "message": "저장"
+    },
+    "cancelLabel": {
+        "message": "취소"
+    },
+    "editLabel": {
+        "message": "편집"
+    },
+    "duplicateLabel": {
+        "message": "복제"
+    },
+    "deleteLabel": {
+        "message": "삭제"
+    },
+    "moveUpLabel": {
+        "message": "위로 이동"
+    },
+    "moveDownLabel": {
+        "message": "아래로 이동"
+    },
+    "exportPrompt": {
+        "message": "프롬프트 내보내기"
+    },
+    "importPrompt": {
+        "message": "프롬프트 가져오기"
+    },
+    "addPromptMessage": {
+        "message": "프롬프트가 추가되었습니다."
+    },
+    "updatePromptMessage": {
+        "message": "프롬프트가 수정되었습니다."
+    },
+    "deletePromptMessage": {
+        "message": "프롬프트가 삭제되었습니다."
+    },
+    "duplicatePromptMessage": {
+        "message": "프롬프트가 복제되었습니다."
+    },
+    "overwritePromptMessage": {
+        "message": "프롬프트가 덮어쓰여졌습니다."
+    },
+    "appendPromptMessage": {
+        "message": "프롬프트가 추가되었습니다."
+    },
+    "error": {
+        "message": "에러"
+    },
+    "jsonValidationErrorMessage": {
+        "message": "유효하지 않은 JSON 형식입니다."
+    },
+    "success": {
+        "message": "성공"
+    },
+    "loadingMessage": {
+        "message": "불러오는 중..."
+    },
+    "urlLengthWarnMessage": {
+        "message": "프롬프트가 너무 길어 브라우저 환경이나 모델 종류에 따라 정상적으로 동작하지 않을 수 있습니다.\n\n문제가 발생할 경우, 복사 버튼을 눌러 프롬프트를 클립보드에 복사한 후 붙여넣어 사용해주세요."
+    },
+    "storageSyncErrorMessage": {
+        "message": "저장 용량을 초과하여 저장할 수 없습니다. 프롬프트의 길이 또는 개수를 줄여주세요."
+    }
+}

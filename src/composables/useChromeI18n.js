@@ -27,8 +27,7 @@ export default function useI18n() {
     if (isChromeI18nAvailable.value) {
       return chrome.i18n.getUILanguage();
     } else {
-      // Local 개발 환경에서는 한국어 사용
-      return "ko-KR";
+      return navigator.language;
     }
   };
 

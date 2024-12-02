@@ -75,11 +75,7 @@ export default function useChromeStorage() {
                         "(Sample) Write an effective marketing strategy for {product} targeting the {target market}. The main goal is {goal}."
                     ];
                 }
-                // 프롬프트를 객체 배열로 변환하여 'prompts.value'에 저장
-                prompts.value = defaultPrompts.map((text, idx) => ({
-                    id: Date.now() + idx,
-                    text,
-                }));
+                prompts.value = defaultPrompts;
                 await set({prompts: defaultPrompts, hasUsedBefore: true});
             } else {
                 if (Array.isArray(data.prompts)) {

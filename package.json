@@ -1,6 +1,6 @@
 {
   "name": "promptly",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "프롬프트 템플릿을 관리하고 ChatGPT에 전달하는 크롬 확장 프로그램입니다.",
   "main": "main.js",
   "scripts": {

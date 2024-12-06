@@ -101,7 +101,7 @@ export default {
       {label: 'ChatGPT 4o', model: 'gpt-4o'},
       {label: 'ChatGPT 4o mini', model: 'gpt-4o-mini'},
       {label: 'ChatGPT 4o with canvas', model: 'gpt-4o-canmore'},
-      {label: 'ChatGPT o1-preview', model: 'o1-preview'},
+      {label: 'ChatGPT o1', model: 'o1'},
       {label: 'ChatGPT o1-mini', model: 'o1-mini'},
       {separator: true},
       {label: 'Claude 3.5 Sonnet', model: 'Claude 3.5 Sonnet'},

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "promptly",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Chrome extension for managing prompt templates and delivering them to AI services.",
   "action": {
     "default_popup": "index.html",

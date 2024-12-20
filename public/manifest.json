@@ -12,7 +12,10 @@
       "128": "icons/appicon_blue_128.png"
     }
   },
-  "permissions": ["storage"],
+  "permissions": ["storage", "contextMenus"],
+  "background": {
+    "service_worker": "worker.js"
+  },
   "icons": {
     "128": "icons/appicon_blue_128.png"
   },

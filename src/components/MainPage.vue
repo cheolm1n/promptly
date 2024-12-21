@@ -9,6 +9,8 @@
           :placeholder="getMessage('selectPromptLabel')"
           style="width: 100%; margin-bottom: 1rem;"
           append-to="self"
+          filter
+          showClear
       />
       <div v-if="variables.length" class="variables-container">
         <div

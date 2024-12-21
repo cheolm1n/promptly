@@ -20,30 +20,30 @@
   </div>
   <div class="tab-content">
     <MainPage v-if="activeIndex === 0" />
-    <PromptManagementPage ref="promptManagementPage" v-else />
+    <PromptManagementPage v-else ref="promptManagementPage" />
   </div>
 </template>
 
 <script setup>
-import MainPage from './components/MainPage.vue';
-import PromptManagementPage from './components/PromptManagementPage.vue';
-import {nextTick, ref, useTemplateRef} from "vue";
+import MainPage from "./components/MainPage.vue";
+import PromptManagementPage from "./components/PromptManagementPage.vue";
+import { nextTick, ref, useTemplateRef } from "vue";
 
-const activeIndex = ref(0)
-const promptManagementPage = useTemplateRef('promptManagementPage')
+const activeIndex = ref(0);
+const promptManagementPage = useTemplateRef("promptManagementPage");
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "addPrompt" && msg.data !== "") {
-    activeIndex.value = 1
+    activeIndex.value = 1;
     nextTick(() => {
-      promptManagementPage.value.handleAddPromptFromContext(msg.data)
-    })
+      promptManagementPage.value.handleAddPromptFromContext(msg.data);
+    });
   }
 });
 </script>
 
 <style>
-@import 'primeicons/primeicons.css';
+@import "primeicons/primeicons.css";
 
 #app {
   min-height: 600px;

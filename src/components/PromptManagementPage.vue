@@ -319,18 +319,9 @@ export default {
 
     function handleAddPromptFromContext(prompt) {
       storage.loadPrompts().then(() => {
-        const newPromptObj = { id: Date.now(), text: prompt };
-        const newPrompts = prompts.value.concat(newPromptObj);
-
-        updateStorePrompts(newPrompts, getMessage('addPromptMessage'))
-            .then(() => {
-              prompts.value.push(newPromptObj);
-              console.log('Prompt added from contextmenu successfully');
-            })
-            .catch((error) => {
-              console.error('Failed to add from contextmenu prompt:', error);
-            });
-        })
+        newPrompt.value = prompt;
+        addPrompt();
+      })
     }
 
     return {

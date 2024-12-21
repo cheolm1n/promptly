@@ -3,12 +3,11 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import js from "@eslint/js";
 
 export default [
-  js.configs.recommended,
   {
     ignores: ["dist/", "dist_local", "archive/", ".idea/"],
   },
-  // add more generic rulesets here, such as:
-  // js.configs.recommended,
+  // 일반적인 규칙을 더 위로 배치
+  js.configs.recommended,
   ...pluginVue.configs["flat/recommended"],
   ...pluginVue.configs["flat/strongly-recommended"],
   {

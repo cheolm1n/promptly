@@ -3,7 +3,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 
 export default [
   {
-    ignores: ["dist*/", "archive/", ".idea/"],
+    ignores: ["dist/", "dist_local", "archive/", ".idea/"],
   },
   // add more generic rulesets here, such as:
   // js.configs.recommended,

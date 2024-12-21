@@ -1,6 +1,6 @@
 <template>
   <div class="container" v-if="loaded">
-    <Textarea v-model="newPrompt" rows="3" cols="30" :placeholder="getMessage('addPromptLabelPlaceholder')" class="textarea" />
+    <Textarea v-model="newPrompt" rows="3" cols="30" :placeholder="getMessage('addPromptLabelPlaceholder')" class="textarea" autoResize/>
     <div class="button-group">
       <Button :label="getMessage('addPromptLabel')" @click="addPrompt" class="add-button" />
       <Menu :model="menuItems" popup ref="menu" />
@@ -350,6 +350,7 @@ export default {
 
 .textarea {
   width: 100%;
+  max-height: 30em;
 }
 
 .button-group {

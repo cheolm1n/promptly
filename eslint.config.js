@@ -5,6 +5,7 @@ import js from "@eslint/js";
 export default [
   {
     ignores: ["dist/", "dist_local", "archive/", ".idea/"],
+    env: { extension: true },
   },
   // 일반적인 규칙을 더 위로 배치
   js.configs.recommended,

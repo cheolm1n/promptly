@@ -317,6 +317,13 @@ export default {
       }
     };
 
+    function handleAddPromptFromContext(prompt) {
+      storage.loadPrompts().then(() => {
+        newPrompt.value = prompt;
+        addPrompt();
+      })
+    }
+
     return {
       prompts,
       newPrompt,
@@ -341,6 +348,7 @@ export default {
       hoveredIndex,
       loaded: storage.loaded,
       getMessage,
+      handleAddPromptFromContext,
     };
   },
 };

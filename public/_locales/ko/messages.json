@@ -106,5 +106,8 @@
     },
     "storageSyncErrorMessage": {
         "message": "저장 용량을 초과하여 저장할 수 없습니다. 프롬프트의 길이 또는 개수를 줄여주세요."
+    },
+    "contextMenuAddSelectedTextAsPrompt": {
+        "message" : "선택한 텍스트를 프롬프트로 추가"
     }
 }

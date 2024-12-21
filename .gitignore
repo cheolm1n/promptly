@@ -1,6 +1,7 @@
 /node_modules/*
 package-lock.json
 /dist/*
+/dist_local/*
 .idea/aws.xml
 .idea/modules.xml
 .idea/promptly.iml

@@ -9,6 +9,8 @@
           :placeholder="getMessage('selectPromptLabel')"
           style="width: 100%; margin-bottom: 1rem;"
           append-to="self"
+          filter
+          showClear
       />
       <div v-if="variables.length" class="variables-container">
         <div
@@ -97,12 +99,11 @@ export default {
 
     // 모델 옵션들
     const modelOptions = [
-      {label: 'ChatGPT 4', model: 'gpt-4'},
       {label: 'ChatGPT 4o', model: 'gpt-4o'},
-      {label: 'ChatGPT 4o mini', model: 'gpt-4o-mini'},
-      {label: 'ChatGPT 4o with canvas', model: 'gpt-4o-canmore'},
       {label: 'ChatGPT o1', model: 'o1'},
       {label: 'ChatGPT o1-mini', model: 'o1-mini'},
+      {label: 'ChatGPT 4o mini', model: 'gpt-4o-mini'},
+      {label: 'ChatGPT 4', model: 'gpt-4'},
       {separator: true},
       {label: 'Claude 3.5 Sonnet', model: 'Claude 3.5 Sonnet'},
       {separator: true},

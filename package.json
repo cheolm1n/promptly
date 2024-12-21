@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --watch"
+    "build": "vite build && node scripts/transformManifest.js",
+    "local": "vite build --outDir dist_local --watch"
   },
   "author": "",
   "license": "MIT",

@@ -6,6 +6,7 @@
       cols="30"
       :placeholder="getMessage('addPromptLabelPlaceholder')"
       class="textarea"
+      autoResize
     />
     <div class="button-group">
       <Button
@@ -466,6 +467,7 @@ export default {
 <style scoped>
 .textarea {
   width: 100%;
+  max-height: 30em;
 }
 
 .button-group {

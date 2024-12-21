@@ -1,5 +1,5 @@
 <template>
-  <Toast position="top-center" class="promptly-toast" />
+  <Toast position="bottom-center" class="promptly-toast" />
   <div class="custom-tabmenu">
     <div
       class="tab-item"

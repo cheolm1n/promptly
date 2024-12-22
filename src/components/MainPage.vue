@@ -2,75 +2,85 @@
   <div class="container">
     <div class="dropdown-container">
       <Select
-          :options="prompts"
-          optionLabel="text"
-          optionValue="value"
-          v-model="selectedPrompt"
-          :placeholder="getMessage('selectPromptLabel')"
-          style="width: 100%; margin-bottom: 1rem;"
-          append-to="self"
-          filter
-          showClear
+        v-model="selectedPrompt"
+        :options="prompts"
+        option-label="text"
+        option-value="value"
+        :placeholder="getMessage('selectPromptLabel')"
+        style="width: 100%; margin-bottom: 1rem"
+        append-to="self"
+        filter
+        showClear
       />
       <div v-if="variables.length" class="variables-container">
         <div
-            v-for="(variable, index) in variables"
-            :key="index"
-            class="p-field variable-field"
+          v-for="(variable, index) in variables"
+          :key="index"
+          class="p-field variable-field"
         >
-          <label :for="'var_' + index">{{ variable }} {{ getMessage('inputLabel') }}:</label>
+          <label :for="'var_' + index"
+            >{{ variable }} {{ getMessage("inputLabel") }}:</label
+          >
           <Textarea
-              v-model="userInputs[variable]"
-              :id="'var_' + index"
-              class="variable-input"
-              autoResize
-              rows="1"
+            :id="'var_' + index"
+            v-model="userInputs[variable]"
+            class="variable-input"
+            auto-resize
+            rows="1"
           />
         </div>
       </div>
     </div>
     <div class="button-container">
       <Button
-          :label="getMessage('viewResultLabel')"
-          @click="generatePrompt"
-          class="result-button"
-          :disabled="!selectedPrompt"
+        :label="getMessage('viewResultLabel')"
+        class="result-button"
+        :disabled="!selectedPrompt"
+        @click="generatePrompt"
       />
     </div>
     <div v-if="filledPrompt" class="p-mt-3">
-      <p><strong>{{ getMessage('resultLabel') }}:</strong></p>
+      <p>
+        <strong>{{ getMessage("resultLabel") }}:</strong>
+      </p>
       <pre class="result-block">{{ filledPrompt }}</pre>
-      <Message :pt="{text: {style: {whiteSpace: 'break-spaces'}}}" v-if="urlLengthAlert" severity="warn">
-        {{getMessage('urlLengthWarnMessage')}}
+      <Message
+        v-if="urlLengthAlert"
+        :pt="{ text: { style: { whiteSpace: 'break-spaces' } } }"
+        severity="warn"
+      >
+        {{ getMessage("urlLengthWarnMessage") }}
       </Message>
       <div class="button-container">
         <SplitButton
-            icon="pi pi-external-link"
-            @click="chatWithModel"
-            :model="modelOptions"
-            style="width: fit-content"
-            :pt="{
+          icon="pi pi-external-link"
+          :model="modelOptions"
+          style="width: fit-content"
+          :pt="{
             pcButton: {
               root: {
-                class: 'run-model-button'
+                class: 'run-model-button',
               },
-            }
+            },
           }"
-            :class="['p-mt-2', getButtonClass]"
+          :class="['p-mt-2', getButtonClass]"
+          @click="chatWithModel"
         >
-          <span style="display: flex; gap: .25rem">
+          <span style="display: flex; gap: 0.25rem">
             <span>
-              {{ getMessage('chatWithLabel') }}
+              {{ getMessage("chatWithLabel") }}
             </span>
-            <span style="font-weight: bold">{{ getModelLabel(selectedModel) }}</span>
+            <span style="font-weight: bold">{{
+              getModelLabel(selectedModel)
+            }}</span>
           </span>
         </SplitButton>
         <Button
-            :label="getMessage('copyLabel')"
-            icon="pi pi-copy"
-            iconPos="left"
-            @click="copyToClipboard"
-            class="p-mt-2 p-button-secondary"
+          :label="getMessage('copyLabel')"
+          icon="pi pi-copy"
+          icon-pos="left"
+          class="p-mt-2 p-button-secondary"
+          @click="copyToClipboard"
         />
       </div>
     </div>
@@ -78,14 +88,14 @@
 </template>
 
 <script>
-import {computed, reactive, ref, watch, onMounted} from 'vue';
-import {useToast} from 'primevue/usetoast';
+import { computed, reactive, ref, watch, onMounted } from "vue";
+import { useToast } from "primevue/usetoast";
 import useChromeStorage from "../composables/useChromeStorage";
 import useI18n from "../composables/useChromeI18n";
-import {getStringBytes} from "../utils/stringUtils";
+import { getStringBytes } from "../utils/stringUtils";
 
 export default {
-  name: 'MainPage',
+  name: "MainPage",
   setup() {
     const storage = useChromeStorage();
     const { getMessage } = useI18n();
@@ -93,22 +103,22 @@ export default {
     const selectedPrompt = ref(null);
     const variables = ref([]);
     const userInputs = reactive({});
-    const filledPrompt = ref('');
-    const selectedModel = ref('gpt-4'); // 기본 값 설정
+    const filledPrompt = ref("");
+    const selectedModel = ref("gpt-4"); // 기본 값 설정
     const urlLengthAlert = ref(false);
 
     // 모델 옵션들
     const modelOptions = [
-      {label: 'ChatGPT 4o', model: 'gpt-4o'},
-      {label: 'ChatGPT o1', model: 'o1'},
-      {label: 'ChatGPT o1-mini', model: 'o1-mini'},
-      {label: 'ChatGPT 4o mini', model: 'gpt-4o-mini'},
-      {label: 'ChatGPT 4', model: 'gpt-4'},
-      {separator: true},
-      {label: 'Claude 3.5 Sonnet', model: 'Claude 3.5 Sonnet'},
-      {separator: true},
-      {label: 'Perplexity', model: 'Perplexity'},
-    ].map(option => ({
+      { label: "ChatGPT 4o", model: "gpt-4o" },
+      { label: "ChatGPT o1", model: "o1" },
+      { label: "ChatGPT o1-mini", model: "o1-mini" },
+      { label: "ChatGPT 4o mini", model: "gpt-4o-mini" },
+      { label: "ChatGPT 4", model: "gpt-4" },
+      { separator: true },
+      { label: "Claude 3.5 Sonnet", model: "Claude 3.5 Sonnet" },
+      { separator: true },
+      { label: "Perplexity", model: "Perplexity" },
+    ].map((option) => ({
       ...option,
       command: () => selectModel(option.model), // command를 동적으로 생성
     }));
@@ -116,49 +126,51 @@ export default {
     // 버튼 클래스 계산
     const getButtonClass = computed(() => {
       const model = selectedModel.value.toLowerCase();
-      if (model.includes('claude')) {
-        return 'p-button-claude';
-      } else if (model.includes('perplexity')) {
-        return 'p-button-perplexity';
+      if (model.includes("claude")) {
+        return "p-button-claude";
+      } else if (model.includes("perplexity")) {
+        return "p-button-perplexity";
       } else {
-        return 'p-button-primary';
+        return "p-button-primary";
       }
     });
 
     // 모델 선택 함수
     const selectModel = (model) => {
-      storage.set({ selectedModel: model })
-          .then(() => {
-            selectedModel.value = model;
-          })
-          .catch((error) => {
-            console.error('Failed to save selected model:', error);
-            toast.add({
-              severity: 'error',
-              summary: getMessage('error'),
-              detail: getMessage('storageSyncErrorMessage'),
-              life: 5000,
-            });
+      storage
+        .set({ selectedModel: model })
+        .then(() => {
+          selectedModel.value = model;
+        })
+        .catch((error) => {
+          console.error("Failed to save selected model:", error);
+          toast.add({
+            severity: "error",
+            summary: getMessage("error"),
+            detail: getMessage("storageSyncErrorMessage"),
+            life: 5000,
           });
+        });
     };
 
     // 모델의 라벨을 가져오는 함수
     const getModelLabel = (model) => {
-      const option = modelOptions.find(option => option.model === model);
+      const option = modelOptions.find((option) => option.model === model);
       return option ? option.label : model;
     };
 
     // 컴포넌트가 마운트될 때 모델을 스토리지에서 불러옴
     onMounted(() => {
-      storage.get('selectedModel')
-          .then((data) => {
-            if (data.selectedModel) {
-              selectedModel.value = data.selectedModel;
-            }
-          })
-          .catch((error) => {
-            console.error('Failed to load selected model:', error);
-          });
+      storage
+        .get("selectedModel")
+        .then((data) => {
+          if (data.selectedModel) {
+            selectedModel.value = data.selectedModel;
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to load selected model:", error);
+        });
     });
 
     const prompts = computed(() => {
@@ -173,30 +185,30 @@ export default {
       if (newPrompt) {
         const varMatches = newPrompt.match(/{(.*?)}/g);
         variables.value = varMatches
-            ? [...new Set(varMatches.map((v) => v.replace(/[{}]/g, '')))]
-            : [];
+          ? [...new Set(varMatches.map((v) => v.replace(/[{}]/g, "")))]
+          : [];
         variables.value.forEach((variable) => {
-          userInputs[variable] = '';
+          userInputs[variable] = "";
         });
-        filledPrompt.value = '';
+        filledPrompt.value = "";
       } else {
         variables.value = [];
       }
     });
 
     function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
     const generatePrompt = () => {
       if (selectedPrompt.value) {
         let tempPrompt = selectedPrompt.value;
         variables.value.forEach((variable) => {
-          const value = userInputs[variable] || '';
+          const value = userInputs[variable] || "";
           const escapedVariable = escapeRegExp(variable);
           tempPrompt = tempPrompt.replace(
-              new RegExp(`\\{${escapedVariable}\\}`, 'g'),
-              value
+            new RegExp(`\\{${escapedVariable}\\}`, "g"),
+            value,
           );
         });
         filledPrompt.value = tempPrompt;
@@ -210,15 +222,15 @@ export default {
         const model = selectedModel.value.toLowerCase();
         let url;
 
-        if (model.includes('claude')) {
+        if (model.includes("claude")) {
           url = `https://claude.ai/new?q=${encodedPrompt}`;
-        } else if (model.includes('perplexity')) {
+        } else if (model.includes("perplexity")) {
           url = `https://perplexity.ai/search?q=${encodedPrompt}`;
         } else {
           url = `https://chat.openai.com/?model=${model}&q=${encodedPrompt}`;
         }
 
-        window.open(url, '_blank');
+        window.open(url, "_blank");
       }
     };
 
@@ -226,16 +238,16 @@ export default {
       try {
         await navigator.clipboard.writeText(filledPrompt.value);
         toast.add({
-          severity: 'success',
-          summary: getMessage('success'),
-          detail: getMessage('copyToClipboardSuccessMessage'),
+          severity: "success",
+          summary: getMessage("success"),
+          detail: getMessage("copyToClipboardSuccessMessage"),
           life: 1000,
         });
       } catch (error) {
         toast.add({
-          severity: 'error',
-          summary: getMessage('error'),
-          detail: getMessage('copyToClipboardErrorMessage'),
+          severity: "error",
+          summary: getMessage("error"),
+          detail: getMessage("copyToClipboardErrorMessage"),
           life: 5000,
         });
       }
@@ -304,13 +316,13 @@ export default {
 
 /* Claude 모델용 버튼 스타일 */
 :deep(.p-button-claude) button {
-  background: #AB4E1C !important;
-  border-color: #AB4E1C !important;
+  background: #ab4e1c !important;
+  border-color: #ab4e1c !important;
 }
 
 :deep(.p-button-claude) button:hover {
-  background: #8B3E12 !important;
-  border-color: #8B3E12 !important;
+  background: #8b3e12 !important;
+  border-color: #8b3e12 !important;
 }
 
 /* Split 버튼 사이의 구분선 색상도 맞춤 */
@@ -344,12 +356,11 @@ export default {
 :deep(.run-model-button) {
   width: fit-content;
   font-size: 16px;
-  padding-right: .75rem;
-  padding-left: .75rem;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
 }
 
 :deep(.p-select-overlay) {
   width: 100% !important;
 }
-
 </style>

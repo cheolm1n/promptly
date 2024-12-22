@@ -2,8 +2,4 @@
 package-lock.json
 /dist/*
 /dist_local/*
-.idea/aws.xml
-.idea/modules.xml
-.idea/promptly.iml
-.idea/vcs.xml
-.idea/workspace.xml
+.idea/

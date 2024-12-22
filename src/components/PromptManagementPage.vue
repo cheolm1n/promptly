@@ -1,44 +1,130 @@
 <template>
-  <div class="container" v-if="loaded">
-    <Textarea v-model="newPrompt" rows="3" cols="30" :placeholder="getMessage('addPromptLabelPlaceholder')" class="textarea" autoResize/>
+  <div v-if="loaded" class="container">
+    <Textarea
+      v-model="newPrompt"
+      rows="3"
+      cols="30"
+      :placeholder="getMessage('addPromptLabelPlaceholder')"
+      class="textarea"
+      autoResize
+    />
     <div class="button-group">
-      <Button :label="getMessage('addPromptLabel')" @click="addPrompt" class="add-button" />
-      <Menu :model="menuItems" popup ref="menu" />
-      <Button icon="pi pi-bars" class="hamburger-button" @click="$refs.menu.toggle($event)" :aria-label="getMessage('menuLabel')" />
+      <Button
+        :label="getMessage('addPromptLabel')"
+        class="add-button"
+        @click="addPrompt"
+      />
+      <Menu ref="menu" :model="menuItems" popup />
+      <Button
+        icon="pi pi-bars"
+        class="hamburger-button"
+        :aria-label="getMessage('menuLabel')"
+        @click="$refs.menu.toggle($event)"
+      />
     </div>
 
-    <input type="file" ref="fileInput" @change="onFileChange" accept=".json" class="import-input" />
+    <input
+      ref="fileInput"
+      type="file"
+      accept=".json"
+      class="import-input"
+      @change="onFileChange"
+    />
 
-    <Dialog :header="getMessage('importPromptLabel')" v-model:visible="dialogVisible" modal>
-      <p>{{ getMessage('overwriteConfirmationMessage') }}</p>
+    <Dialog
+      v-model:visible="dialogVisible"
+      :header="getMessage('importPromptLabel')"
+      modal
+    >
+      <p>{{ getMessage("overwriteConfirmationMessage") }}</p>
       <div class="dialog-actions">
-        <Button :label="getMessage('overwritePromptLabel')" icon="pi pi-refresh" @click="overwritePrompts" style="margin-right: 1rem"/>
-        <Button :label="getMessage('appendPromptLabel')" icon="pi pi-plus" @click="appendPrompts" />
+        <Button
+          :label="getMessage('overwritePromptLabel')"
+          icon="pi pi-refresh"
+          style="margin-right: 1rem"
+          @click="overwritePrompts"
+        />
+        <Button
+          :label="getMessage('appendPromptLabel')"
+          icon="pi pi-plus"
+          @click="appendPrompts"
+        />
       </div>
     </Dialog>
 
     <transition-group name="list" tag="ul" class="prompt-list">
-      <li v-for="(prompt, index) in prompts" :key="prompt.id" class="prompt-card" @mouseover="hoveredIndex = index" @mouseleave="hoveredIndex = -1">
+      <li
+        v-for="(prompt, index) in prompts"
+        :key="prompt.id"
+        class="prompt-card"
+        @mouseover="hoveredIndex = index"
+        @mouseleave="hoveredIndex = -1"
+      >
         <div class="prompt-content">
           <div v-if="editingIndex === index" class="edit-mode">
-            <Textarea v-model="editedPrompt" rows="3" class="input-edit" autoResize />
+            <Textarea
+              v-model="editedPrompt"
+              rows="3"
+              class="input-edit"
+              auto-resize
+            />
             <div class="prompt-actions">
-              <Button icon="pi pi-check" class="save-button" @click="saveEditedPrompt(index)" :aria-label="getMessage('saveLabel')" />
-              <Button icon="pi pi-times" class="cancel-button" @click="cancelEdit" :aria-label="getMessage('cancelLabel')" />
+              <Button
+                icon="pi pi-check"
+                class="save-button"
+                :aria-label="getMessage('saveLabel')"
+                @click="saveEditedPrompt(index)"
+              />
+              <Button
+                icon="pi pi-times"
+                class="cancel-button"
+                :aria-label="getMessage('cancelLabel')"
+                @click="cancelEdit"
+              />
             </div>
           </div>
           <div v-else class="view-mode">
             <div class="prompt-text-wrapper">
               <p class="prompt-text">{{ prompt.text }}</p>
               <transition name="fade">
-                <div class="prompt-actions-overlay" v-show="hoveredIndex === index">
+                <div
+                  v-show="hoveredIndex === index"
+                  class="prompt-actions-overlay"
+                >
                   <transition name="fade">
                     <div class="prompt-actions">
-                      <Button icon="pi pi-pencil" class="edit-button" @click="editPrompt(index)" :aria-label="getMessage('editLabel')" />
-                      <Button icon="pi pi-copy" class="duplicate-button" @click="duplicatePrompt(index)" :aria-label="getMessage('duplicateLabel')" />
-                      <Button icon="pi pi-trash" class="delete-button" @click="deletePrompt(index)" :aria-label="getMessage('deleteLabel')" />
-                      <Button icon="pi pi-arrow-up" class="move-up-button" @click="movePromptUp(index)" :aria-label="getMessage('moveUpLabel')" :disabled="index === 0" />
-                      <Button icon="pi pi-arrow-down" class="move-down-button" @click="movePromptDown(index)" :aria-label="getMessage('moveDownLabel')" :disabled="index === prompts.length - 1" />
+                      <Button
+                        icon="pi pi-pencil"
+                        class="edit-button"
+                        :aria-label="getMessage('editLabel')"
+                        @click="editPrompt(index)"
+                      />
+                      <Button
+                        icon="pi pi-copy"
+                        class="duplicate-button"
+                        :aria-label="getMessage('duplicateLabel')"
+                        @click="duplicatePrompt(index)"
+                      />
+                      <Button
+                        icon="pi pi-trash"
+                        class="delete-button"
+                        :aria-label="getMessage('deleteLabel')"
+                        @click="deletePrompt(index)"
+                      />
+                      <Button
+                        icon="pi pi-arrow-up"
+                        class="move-up-button"
+                        :aria-label="getMessage('moveUpLabel')"
+                        :disabled="index === 0"
+                        @click="movePromptUp(index)"
+                      />
+                      <Button
+                        icon="pi pi-arrow-down"
+                        class="move-down-button"
+                        :aria-label="getMessage('moveDownLabel')"
+                        :disabled="index === prompts.length - 1"
+                        @click="movePromptDown(index)"
+                      />
                     </div>
                   </transition>
                 </div>
@@ -50,20 +136,20 @@
     </transition-group>
   </div>
   <div v-else>
-    <p>{{ getMessage('loadingMessage') }}</p>
+    <p>{{ getMessage("loadingMessage") }}</p>
   </div>
 </template>
 
 <script>
-import {ref} from 'vue';
-import {useToast} from 'primevue/usetoast';
-import Menu from 'primevue/menu';
-import Dialog from 'primevue/dialog';
+import { ref } from "vue";
+import { useToast } from "primevue/usetoast";
+import Menu from "primevue/menu";
+import Dialog from "primevue/dialog";
 import useChromeStorage from "../composables/useChromeStorage";
 import useI18n from "../composables/useChromeI18n";
 
 export default {
-  name: 'PromptManagementPage',
+  name: "PromptManagementPage",
   components: {
     Menu,
     Dialog,
@@ -71,8 +157,8 @@ export default {
   setup() {
     const storage = useChromeStorage();
     const { getMessage } = useI18n();
-    const newPrompt = ref('');
-    const editedPrompt = ref('');
+    const newPrompt = ref("");
+    const editedPrompt = ref("");
     const editingIndex = ref(-1);
     const fileInput = ref(null);
     const dialogVisible = ref(false);
@@ -94,13 +180,13 @@ export default {
 
     const menuItems = [
       {
-        label: getMessage('exportPrompt'),
-        icon: 'pi pi-download',
+        label: getMessage("exportPrompt"),
+        icon: "pi pi-download",
         command: () => exportPrompts(),
       },
       {
-        label: getMessage('importPrompt'),
-        icon: 'pi pi-upload',
+        label: getMessage("importPrompt"),
+        icon: "pi pi-upload",
         command: () => fileInput.value.click(),
       },
     ];
@@ -110,15 +196,15 @@ export default {
         const newPromptObj = { id: Date.now(), text: newPrompt.value.trim() };
         const newPrompts = prompts.value.concat(newPromptObj);
 
-        updateStorePrompts(newPrompts, getMessage('addPromptMessage'))
-            .then(() => {
-              prompts.value.push(newPromptObj);
-              console.log('Prompt added successfully');
-            })
-            .catch((error) => {
-              console.error('Failed to add prompt:', error);
-            });
-        newPrompt.value = '';
+        updateStorePrompts(newPrompts, getMessage("addPromptMessage"))
+          .then(() => {
+            prompts.value.push(newPromptObj);
+            console.log("Prompt added successfully");
+          })
+          .catch((error) => {
+            console.error("Failed to add prompt:", error);
+          });
+        newPrompt.value = "";
       }
     };
 
@@ -129,68 +215,77 @@ export default {
 
     const saveEditedPrompt = (index) => {
       if (editingIndex.value > -1 && editedPrompt.value.trim()) {
-        const updatedPrompt = { ...prompts.value[index], text: editedPrompt.value.trim() };
+        const updatedPrompt = {
+          ...prompts.value[index],
+          text: editedPrompt.value.trim(),
+        };
         const newPrompts = prompts.value.slice();
         newPrompts.splice(index, 1, updatedPrompt);
 
-        updateStorePrompts(newPrompts, getMessage('updatePromptMessage'))
-            .then(() => {
-              prompts.value[index].text = editedPrompt.value.trim();
-              editingIndex.value = -1;
-              console.log('Prompt updated successfully');
-            })
-            .catch((error) => {
-              console.error('Failed to update prompt:', error);
-            });
+        updateStorePrompts(newPrompts, getMessage("updatePromptMessage"))
+          .then(() => {
+            prompts.value[index].text = editedPrompt.value.trim();
+            editingIndex.value = -1;
+            console.log("Prompt updated successfully");
+          })
+          .catch((error) => {
+            console.error("Failed to update prompt:", error);
+          });
       }
     };
 
     const cancelEdit = () => {
       editingIndex.value = -1; // 편집 모드 종료
-      editedPrompt.value = ''; // 수정 중인 프롬프트 초기화
+      editedPrompt.value = ""; // 수정 중인 프롬프트 초기화
     };
 
     const deletePrompt = (index) => {
       const newPrompts = prompts.value.slice();
       newPrompts.splice(index, 1);
 
-      updateStorePrompts(newPrompts, getMessage('deletePromptMessage'))
-          .then(() => {
-            prompts.value.splice(index, 1);
-            console.log('Prompt deleted successfully');
-          })
-          .catch((error) => {
-            console.error('Failed to delete prompt:', error);
-          });
+      updateStorePrompts(newPrompts, getMessage("deletePromptMessage"))
+        .then(() => {
+          prompts.value.splice(index, 1);
+          console.log("Prompt deleted successfully");
+        })
+        .catch((error) => {
+          console.error("Failed to delete prompt:", error);
+        });
     };
 
     const duplicatePrompt = (index) => {
-      const promptToDuplicate = { id: Date.now(), text: prompts.value[index].text };
+      const promptToDuplicate = {
+        id: Date.now(),
+        text: prompts.value[index].text,
+      };
       const newPrompts = prompts.value.slice();
       newPrompts.splice(index + 1, 0, promptToDuplicate);
 
-      updateStorePrompts(newPrompts, getMessage('duplicatePromptMessage'))
-          .then(() => {
-            prompts.value.splice(index + 1, 0, promptToDuplicate);
-            console.log('Prompt duplicated successfully');
-          })
-          .catch((error) => {
-            console.error('Failed to duplicate prompt:', error);
-          });
+      updateStorePrompts(newPrompts, getMessage("duplicatePromptMessage"))
+        .then(() => {
+          prompts.value.splice(index + 1, 0, promptToDuplicate);
+          console.log("Prompt duplicated successfully");
+        })
+        .catch((error) => {
+          console.error("Failed to duplicate prompt:", error);
+        });
     };
 
     const exportPrompts = () => {
-      const dataStr = JSON.stringify(prompts.value.map(p => p.text), null, 2);
-      const blob = new Blob([dataStr], {type: 'application/json'});
+      const dataStr = JSON.stringify(
+        prompts.value.map((p) => p.text),
+        null,
+        2,
+      );
+      const blob = new Blob([dataStr], { type: "application/json" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       const now = new Date();
-      const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(
-          now.getDate()
-      ).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(
-          2,
-          '0'
-      )}${String(now.getSeconds()).padStart(2, '0')}`; // 타임스탬프 생성
+      const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(
+        now.getDate(),
+      ).padStart(2, "0")}${String(now.getHours()).padStart(2, "0")}${String(
+        now.getMinutes(),
+      ).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`; // 타임스탬프 생성
       a.href = url;
       a.download = `prompts_${timestamp}.json`; // 파일 이름에 타임스탬프 추가
       a.click();
@@ -204,17 +299,20 @@ export default {
         reader.onload = (e) => {
           try {
             const parsedPrompts = JSON.parse(e.target.result);
-            if (Array.isArray(parsedPrompts) && parsedPrompts.every((item) => typeof item === 'string')) {
+            if (
+              Array.isArray(parsedPrompts) &&
+              parsedPrompts.every((item) => typeof item === "string")
+            ) {
               importedPrompts.value = parsedPrompts;
               dialogVisible.value = true; // 대화창 표시
             } else {
-              throw new Error('Invalid format');
+              throw new Error("Invalid format");
             }
           } catch (error) {
             toast.add({
-              severity: 'error',
-              summary: getMessage('error'),
-              detail: getMessage('jsonValidationErrorMessage'),
+              severity: "error",
+              summary: getMessage("error"),
+              detail: getMessage("jsonValidationErrorMessage"),
               life: 5000,
             });
           }
@@ -231,14 +329,14 @@ export default {
         text,
       }));
 
-      updateStorePrompts(newPrompts, getMessage('overwritePromptMessage'))
-          .then(() => {
-            prompts.value = newPrompts;
-            console.log('Prompts overwritten successfully');
-          })
-          .catch((error) => {
-            console.error('Failed to overwrite prompts:', error);
-          });
+      updateStorePrompts(newPrompts, getMessage("overwritePromptMessage"))
+        .then(() => {
+          prompts.value = newPrompts;
+          console.log("Prompts overwritten successfully");
+        })
+        .catch((error) => {
+          console.error("Failed to overwrite prompts:", error);
+        });
       dialogVisible.value = false;
     };
 
@@ -249,68 +347,80 @@ export default {
       }));
       const newPrompts = prompts.value.concat(importedWithIds);
 
-      updateStorePrompts(newPrompts, getMessage('appendPromptMessage'))
-          .then(() => {
-            prompts.value = newPrompts;
-            console.log('Prompts appended successfully');
-          })
-          .catch((error) => {
-            console.error('Failed to append prompts:', error);
-          });
+      updateStorePrompts(newPrompts, getMessage("appendPromptMessage"))
+        .then(() => {
+          prompts.value = newPrompts;
+          console.log("Prompts appended successfully");
+        })
+        .catch((error) => {
+          console.error("Failed to append prompts:", error);
+        });
       dialogVisible.value = false;
     };
 
     const movePromptUp = (index) => {
       if (index > 0) {
         const newPrompts = prompts.value.slice();
-        [newPrompts[index - 1], newPrompts[index]] = [newPrompts[index], newPrompts[index - 1]];
+        [newPrompts[index - 1], newPrompts[index]] = [
+          newPrompts[index],
+          newPrompts[index - 1],
+        ];
 
         updateStorePrompts(newPrompts)
-            .then(() => {
-              [prompts.value[index - 1], prompts.value[index]] = [prompts.value[index], prompts.value[index - 1]];
-              console.log('Prompt moved up successfully');
-            })
-            .catch((error) => {
-              console.error('Failed to move prompt up:', error);
-            });
+          .then(() => {
+            [prompts.value[index - 1], prompts.value[index]] = [
+              prompts.value[index],
+              prompts.value[index - 1],
+            ];
+            console.log("Prompt moved up successfully");
+          })
+          .catch((error) => {
+            console.error("Failed to move prompt up:", error);
+          });
       }
     };
 
     const movePromptDown = (index) => {
       if (index < prompts.value.length - 1) {
         const newPrompts = prompts.value.slice();
-        [newPrompts[index], newPrompts[index + 1]] = [newPrompts[index + 1], newPrompts[index]];
+        [newPrompts[index], newPrompts[index + 1]] = [
+          newPrompts[index + 1],
+          newPrompts[index],
+        ];
 
         updateStorePrompts(newPrompts)
-            .then(() => {
-              [prompts.value[index], prompts.value[index + 1]] = [prompts.value[index + 1], prompts.value[index]];
-              console.log('Prompt moved down successfully');
-            })
-            .catch((error) => {
-              console.error('Failed to move prompt down:', error);
-            });
+          .then(() => {
+            [prompts.value[index], prompts.value[index + 1]] = [
+              prompts.value[index + 1],
+              prompts.value[index],
+            ];
+            console.log("Prompt moved down successfully");
+          })
+          .catch((error) => {
+            console.error("Failed to move prompt down:", error);
+          });
       }
     };
 
     const updateStorePrompts = async (newPrompts, message) => {
       const promptsTexts = newPrompts.map((prompt) => prompt.text);
       try {
-        await storage.set({prompts: promptsTexts});
+        await storage.set({ prompts: promptsTexts });
         storage.prompts.value = promptsTexts;
         if (message) {
           toast.add({
-            severity: 'success',
-            summary: getMessage('success'),
+            severity: "success",
+            summary: getMessage("success"),
             detail: message,
             life: 1000,
           });
         }
       } catch (error) {
-        console.error('Storage set error:', error);
+        console.error("Storage set error:", error);
         toast.add({
-          severity: 'error',
-          summary: getMessage('error'),
-          detail: getMessage('storageSyncErrorMessage'),
+          severity: "error",
+          summary: getMessage("error"),
+          detail: getMessage("storageSyncErrorMessage"),
           life: 5000,
         });
         throw error;
@@ -321,7 +431,7 @@ export default {
       storage.loadPrompts().then(() => {
         newPrompt.value = prompt;
         addPrompt();
-      })
+      });
     }
 
     return {
@@ -355,7 +465,6 @@ export default {
 </script>
 
 <style scoped>
-
 .textarea {
   width: 100%;
   max-height: 30em;

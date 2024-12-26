@@ -72,6 +72,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: bold;
+  font-size: 1.4em;
 }
 
 .tab-item i {

@@ -223,6 +223,7 @@ export default {
             console.error("Failed to add prompt:", error);
           });
         newPrompt.value = "";
+        newTitle.value = "";
       }
     };
 

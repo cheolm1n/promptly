@@ -17,6 +17,9 @@
     "copyLabel": {
         "message": "복사"
     },
+    "addPromptTitlePlaceholder": {
+        "message": "제목"
+    },
     "addPromptLabelPlaceholder": {
         "message": "{변수}를 포함해 새 프롬프트를 작성해보세요!"
     },

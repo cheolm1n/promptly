@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@primevue/themes": "^4.2.2",
+    "nanoid": "^5.0.9",
     "primeicons": "^6.0.1",
     "primevue": "^4.2.2",
     "vue": "^3.0.0",

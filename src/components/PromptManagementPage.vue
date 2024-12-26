@@ -1,5 +1,10 @@
 <template>
   <div v-if="loaded" class="container">
+    <InputText
+      v-model="newTitle"
+      class="new-title-input"
+      :placeholder="getMessage('addPromptTitlePlaceholder')"
+    />
     <Textarea
       v-model="newPrompt"
       rows="3"
@@ -62,6 +67,7 @@
       >
         <div class="prompt-content">
           <div v-if="editingIndex === index" class="edit-mode">
+            <InputText class="title-edit" v-model="editedTitle" />
             <Textarea
               v-model="editedPrompt"
               rows="3"
@@ -85,6 +91,7 @@
           </div>
           <div v-else class="view-mode">
             <div class="prompt-text-wrapper">
+              <p class="prompt-title">{{ prompt.title }}</p>
               <p class="prompt-text">{{ prompt.text }}</p>
               <transition name="fade">
                 <div
@@ -147,6 +154,14 @@ import Menu from "primevue/menu";
 import Dialog from "primevue/dialog";
 import useChromeStorage from "../composables/useChromeStorage";
 import useI18n from "../composables/useChromeI18n";
+import {
+  addId,
+  convertImportedPrompt,
+  convertPromptToExport,
+  convertPromptToStore,
+  updatePrompt,
+} from "../utils/promptConverter";
+import { nanoid } from "nanoid";
 
 export default {
   name: "PromptManagementPage",
@@ -157,7 +172,9 @@ export default {
   setup() {
     const storage = useChromeStorage();
     const { getMessage } = useI18n();
+    const newTitle = ref("");
     const newPrompt = ref("");
+    const editedTitle = ref("");
     const editedPrompt = ref("");
     const editingIndex = ref(-1);
     const fileInput = ref(null);
@@ -172,10 +189,7 @@ export default {
 
     // 데이터 로드 완료 상태
     storage.loadPrompts().then(() => {
-      prompts.value = storage.prompts.value.map((text, idx) => ({
-        id: Date.now() + idx,
-        text,
-      }));
+      prompts.value = storage.prompts.value.map(updatePrompt);
     });
 
     const menuItems = [
@@ -192,8 +206,12 @@ export default {
     ];
 
     const addPrompt = () => {
-      if (newPrompt.value.trim()) {
-        const newPromptObj = { id: Date.now(), text: newPrompt.value.trim() };
+      if (newPrompt.value.trim() && newTitle.value.trim()) {
+        const newPromptObj = {
+          id: nanoid(),
+          text: newPrompt.value.trim(),
+          title: newTitle.value.trim(),
+        };
         const newPrompts = prompts.value.concat(newPromptObj);
 
         updateStorePrompts(newPrompts, getMessage("addPromptMessage"))
@@ -205,12 +223,14 @@ export default {
             console.error("Failed to add prompt:", error);
           });
         newPrompt.value = "";
+        newTitle.value = "";
       }
     };
 
     const editPrompt = (index) => {
       editingIndex.value = index;
       editedPrompt.value = prompts.value[index].text;
+      editedTitle.value = prompts.value[index].title;
     };
 
     const saveEditedPrompt = (index) => {
@@ -218,13 +238,14 @@ export default {
         const updatedPrompt = {
           ...prompts.value[index],
           text: editedPrompt.value.trim(),
+          title: editedTitle.value.trim(),
         };
         const newPrompts = prompts.value.slice();
         newPrompts.splice(index, 1, updatedPrompt);
 
         updateStorePrompts(newPrompts, getMessage("updatePromptMessage"))
           .then(() => {
-            prompts.value[index].text = editedPrompt.value.trim();
+            prompts.value[index] = updatedPrompt;
             editingIndex.value = -1;
             console.log("Prompt updated successfully");
           })
@@ -237,6 +258,7 @@ export default {
     const cancelEdit = () => {
       editingIndex.value = -1; // 편집 모드 종료
       editedPrompt.value = ""; // 수정 중인 프롬프트 초기화
+      editedTitle.value = ""; // 수정 중인 프롬프트 초기화
     };
 
     const deletePrompt = (index) => {
@@ -255,8 +277,8 @@ export default {
 
     const duplicatePrompt = (index) => {
       const promptToDuplicate = {
-        id: Date.now(),
-        text: prompts.value[index].text,
+        ...prompts.value[index],
+        id: nanoid(),
       };
       const newPrompts = prompts.value.slice();
       newPrompts.splice(index + 1, 0, promptToDuplicate);
@@ -273,7 +295,7 @@ export default {
 
     const exportPrompts = () => {
       const dataStr = JSON.stringify(
-        prompts.value.map((p) => p.text),
+        prompts.value.map(convertPromptToExport),
         null,
         2,
       );
@@ -299,10 +321,7 @@ export default {
         reader.onload = (e) => {
           try {
             const parsedPrompts = JSON.parse(e.target.result);
-            if (
-              Array.isArray(parsedPrompts) &&
-              parsedPrompts.every((item) => typeof item === "string")
-            ) {
+            if (Array.isArray(parsedPrompts)) {
               importedPrompts.value = parsedPrompts;
               dialogVisible.value = true; // 대화창 표시
             } else {
@@ -324,10 +343,9 @@ export default {
     };
 
     const overwritePrompts = () => {
-      const newPrompts = importedPrompts.value.map((text, idx) => ({
-        id: Date.now() + idx,
-        text,
-      }));
+      const newPrompts = importedPrompts.value
+        .map(convertImportedPrompt)
+        .map(addId);
 
       updateStorePrompts(newPrompts, getMessage("overwritePromptMessage"))
         .then(() => {
@@ -341,10 +359,9 @@ export default {
     };
 
     const appendPrompts = () => {
-      const importedWithIds = importedPrompts.value.map((text, idx) => ({
-        id: Date.now() + prompts.value.length + idx,
-        text,
-      }));
+      const importedWithIds = importedPrompts.value
+        .map(convertImportedPrompt)
+        .map(addId);
       const newPrompts = prompts.value.concat(importedWithIds);
 
       updateStorePrompts(newPrompts, getMessage("appendPromptMessage"))
@@ -403,7 +420,7 @@ export default {
     };
 
     const updateStorePrompts = async (newPrompts, message) => {
-      const promptsTexts = newPrompts.map((prompt) => prompt.text);
+      const promptsTexts = newPrompts.map(convertPromptToStore);
       try {
         await storage.set({ prompts: promptsTexts });
         storage.prompts.value = promptsTexts;
@@ -430,12 +447,12 @@ export default {
     function handleAddPromptFromContext(prompt) {
       storage.loadPrompts().then(() => {
         newPrompt.value = prompt;
-        addPrompt();
       });
     }
 
     return {
       prompts,
+      newTitle,
       newPrompt,
       addPrompt,
       editPrompt,
@@ -447,6 +464,7 @@ export default {
       onFileChange,
       overwritePrompts,
       appendPrompts,
+      editedTitle,
       editedPrompt,
       editingIndex,
       menuItems,
@@ -465,6 +483,11 @@ export default {
 </script>
 
 <style scoped>
+.new-title-input {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
 .textarea {
   width: 100%;
   max-height: 30em;
@@ -525,11 +548,16 @@ export default {
   position: relative;
 }
 
+.prompt-title {
+  font-weight: bold;
+  margin-top: 0;
+}
+
 .prompt-text {
   margin: 0;
   word-wrap: break-word;
   font-size: 1em;
-  padding: 1rem;
+  padding: 0.25rem 1rem 1rem 1rem;
 }
 
 .prompt-actions-overlay {
@@ -560,6 +588,11 @@ export default {
 
 .prompt-card:hover .prompt-actions {
   opacity: 1;
+}
+
+.title-edit {
+  width: 100%;
+  margin-bottom: 0.5rem;
 }
 
 .input-edit {

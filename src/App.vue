@@ -27,7 +27,7 @@
 <script setup>
 import MainPage from "./components/MainPage.vue";
 import PromptManagementPage from "./components/PromptManagementPage.vue";
-import { nextTick, ref, useTemplateRef } from "vue";
+import { nextTick, onMounted, ref, useTemplateRef } from "vue";
 
 const activeIndex = ref(0);
 const promptManagementPage = useTemplateRef("promptManagementPage");
@@ -35,6 +35,8 @@ const promptManagementPage = useTemplateRef("promptManagementPage");
 const isChromeRuntimeAvailable = ref(
   typeof chrome !== "undefined" && chrome.runtime !== undefined,
 );
+
+onMounted(() => {
 
 if (isChromeRuntimeAvailable.value) {
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
@@ -46,6 +48,7 @@ if (isChromeRuntimeAvailable.value) {
     }
   });
 }
+})
 </script>
 
 <style>

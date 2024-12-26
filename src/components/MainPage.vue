@@ -2,16 +2,29 @@
   <div class="container">
     <div class="dropdown-container">
       <Select
-        v-model="selectedPrompt"
+        v-model="selectedPromptId"
         :options="prompts"
-        option-label="text"
-        option-value="value"
+        option-label="title"
+        option-value="id"
+        :label-style="{ 'font-weight': 'bold' }"
         :placeholder="getMessage('selectPromptLabel')"
         style="width: 100%; margin-bottom: 1rem"
         append-to="self"
         filter
+        :filter-fields="['title', 'text']"
         showClear
-      />
+      >
+        <template style="flex-direction: column" #option="optionData">
+          <div class="prompt-option">
+            <p class="prompt-option-title">
+              {{ optionData.option.title }}
+            </p>
+            <span class="prompt-option-text">
+              {{ optionData.option.text }}
+            </span>
+          </div>
+        </template>
+      </Select>
       <div v-if="variables.length" class="variables-container">
         <div
           v-for="(variable, index) in variables"
@@ -35,7 +48,7 @@
       <Button
         :label="getMessage('viewResultLabel')"
         class="result-button"
-        :disabled="!selectedPrompt"
+        :disabled="!selectedPromptId"
         @click="generatePrompt"
       />
     </div>
@@ -93,6 +106,7 @@ import { useToast } from "primevue/usetoast";
 import useChromeStorage from "../composables/useChromeStorage";
 import useI18n from "../composables/useChromeI18n";
 import { getStringBytes } from "../utils/stringUtils";
+import { addId, updatePrompt } from "../utils/promptConverter";
 
 export default {
   name: "MainPage",
@@ -100,7 +114,7 @@ export default {
     const storage = useChromeStorage();
     const { getMessage } = useI18n();
     const toast = useToast();
-    const selectedPrompt = ref(null);
+    const selectedPromptId = ref(null);
     const variables = ref([]);
     const userInputs = reactive({});
     const filledPrompt = ref("");
@@ -163,9 +177,9 @@ export default {
     onMounted(() => {
       storage
         .get("selectedModel")
-        .then((data) => {
-          if (data.selectedModel) {
-            selectedModel.value = data.selectedModel;
+        .then((model) => {
+          if (model) {
+            selectedModel.value = model;
           }
         })
         .catch((error) => {
@@ -174,15 +188,16 @@ export default {
     });
 
     const prompts = computed(() => {
-      return storage.prompts.value.map((prompt, index) => ({
-        text: prompt,
-        value: prompt,
-        id: index,
-      }));
+      return storage.prompts.value.map(addId);
     });
 
-    watch(selectedPrompt, (newPrompt) => {
-      if (newPrompt) {
+    function findPromptById(id) {
+      return prompts.value.find((prompt) => prompt.id === id);
+    }
+
+    watch(selectedPromptId, (selectedPromptId) => {
+      if (selectedPromptId) {
+        const newPrompt = findPromptById(selectedPromptId).text;
         const varMatches = newPrompt.match(/{(.*?)}/g);
         variables.value = varMatches
           ? [...new Set(varMatches.map((v) => v.replace(/[{}]/g, "")))]
@@ -201,8 +216,8 @@ export default {
     }
 
     const generatePrompt = () => {
-      if (selectedPrompt.value) {
-        let tempPrompt = selectedPrompt.value;
+      if (selectedPromptId.value) {
+        let tempPrompt = findPromptById(selectedPromptId.value)?.text ?? "";
         variables.value.forEach((variable) => {
           const value = userInputs[variable] || "";
           const escapedVariable = escapeRegExp(variable);
@@ -255,7 +270,7 @@ export default {
 
     return {
       prompts,
-      selectedPrompt,
+      selectedPromptId,
       variables,
       userInputs,
       generatePrompt,
@@ -276,6 +291,27 @@ export default {
 <style scoped>
 .p-field {
   margin-top: 1em;
+}
+
+.prompt-option {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.prompt-option-title {
+  width: 100%;
+  margin: 0;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.prompt-option-text {
+  width: 100%;
+  margin: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .variable-input {

@@ -32,14 +32,20 @@ import { nextTick, ref, useTemplateRef } from "vue";
 const activeIndex = ref(0);
 const promptManagementPage = useTemplateRef("promptManagementPage");
 
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === "addPrompt" && msg.data !== "") {
-    activeIndex.value = 1;
-    nextTick(() => {
-      promptManagementPage.value.handleAddPromptFromContext(msg.data);
-    });
-  }
-});
+const isChromeRuntimeAvailable = ref(
+  typeof chrome !== "undefined" && chrome.runtime !== undefined,
+);
+
+if (isChromeRuntimeAvailable.value) {
+  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.type === "addPrompt" && msg.data !== "") {
+      activeIndex.value = 1;
+      nextTick(() => {
+        promptManagementPage.value.handleAddPromptFromContext(msg.data);
+      });
+    }
+  });
+}
 </script>
 
 <style>

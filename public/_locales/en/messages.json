@@ -17,6 +17,9 @@
     "copyLabel": {
         "message": "Copy"
     },
+    "addPromptTitlePlaceholder": {
+        "message": "Title"
+    },
     "addPromptLabelPlaceholder": {
         "message": "Create a new prompt with {variable}!"
     },

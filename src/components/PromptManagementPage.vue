@@ -447,7 +447,6 @@ export default {
     function handleAddPromptFromContext(prompt) {
       storage.loadPrompts().then(() => {
         newPrompt.value = prompt;
-        addPrompt();
       });
     }
 

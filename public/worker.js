@@ -22,6 +22,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 function onClickAddSelectedTextAsPrompt(info, tab) {
   chrome.action.openPopup().then(() => {
-    chrome.runtime.sendMessage({ type: "addPrompt", data: info.selectionText });
+    chrome.runtime.sendMessage({
+      type: "addPrompt",
+      data: info.selectionText,
+    });
   });
 }

@@ -37,18 +37,17 @@ const isChromeRuntimeAvailable = ref(
 );
 
 onMounted(() => {
-
-if (isChromeRuntimeAvailable.value) {
-  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    if (msg.type === "addPrompt" && msg.data !== "") {
-      activeIndex.value = 1;
-      nextTick(() => {
-        promptManagementPage.value.handleAddPromptFromContext(msg.data);
-      });
-    }
-  });
-}
-})
+  if (isChromeRuntimeAvailable.value) {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+      if (msg.type === "addPrompt" && msg.data !== "") {
+        activeIndex.value = 1;
+        nextTick(() => {
+          promptManagementPage.value.handleAddPromptFromContext(msg.data);
+        });
+      }
+    });
+  }
+});
 </script>
 
 <style>

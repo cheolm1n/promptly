@@ -3,7 +3,6 @@ import { nanoid } from "nanoid";
 function updateInitialVersion(promptData, idx) {
   // 초기 버전의 promptData를 최신 버전으로 변환
   return {
-    id: nanoid(),
     title: `#${idx + 1}`,
     text: promptData,
   };

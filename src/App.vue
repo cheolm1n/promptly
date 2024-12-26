@@ -32,7 +32,13 @@ import { nextTick, onMounted, ref, useTemplateRef } from "vue";
 const activeIndex = ref(0);
 const promptManagementPage = useTemplateRef("promptManagementPage");
 
+const isChromeRuntimeAvailable = ref(
+  typeof chrome !== "undefined" && chrome.runtime !== undefined,
+);
+
 onMounted(() => {
+
+if (isChromeRuntimeAvailable.value) {
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.type === "addPrompt" && msg.data !== "") {
       activeIndex.value = 1;
@@ -41,7 +47,8 @@ onMounted(() => {
       });
     }
   });
-});
+}
+})
 </script>
 
 <style>
@@ -74,6 +81,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: bold;
+  font-size: 1.4em;
 }
 
 .tab-item i {

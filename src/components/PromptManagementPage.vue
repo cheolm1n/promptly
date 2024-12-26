@@ -237,7 +237,7 @@ export default {
         const updatedPrompt = {
           ...prompts.value[index],
           text: editedPrompt.value.trim(),
-          title: editedTitle.value,
+          title: editedTitle.value.trim(),
         };
         const newPrompts = prompts.value.slice();
         newPrompts.splice(index, 1, updatedPrompt);

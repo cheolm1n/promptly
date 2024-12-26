@@ -276,7 +276,7 @@ export default {
 
     const duplicatePrompt = (index) => {
       const promptToDuplicate = {
-        ...structuredClone(prompts.value[index]),
+        ...prompts.value[index],
         id: nanoid(),
       };
       const newPrompts = prompts.value.slice();

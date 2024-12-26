@@ -188,7 +188,7 @@ export default {
     });
 
     const prompts = computed(() => {
-      return storage.prompts.value.map(updatePrompt).map(addId);
+      return storage.prompts.value.map(addId);
     });
 
     function findPromptById(id) {

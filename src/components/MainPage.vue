@@ -196,7 +196,6 @@ export default {
     }
 
     watch(selectedPromptId, (selectedPromptId) => {
-      console.log(selectedPromptId);
       if (selectedPromptId) {
         const newPrompt = findPromptById(selectedPromptId).text;
         const varMatches = newPrompt.match(/{(.*?)}/g);

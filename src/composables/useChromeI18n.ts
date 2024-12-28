@@ -2,12 +2,14 @@ import { ref } from "vue";
 import en from "../../public/_locales/en/messages.json";
 import ko from "../../public/_locales/ko/messages.json";
 
+export type MessageKey = Extract<keyof typeof en, keyof typeof ko>;
+
 export default function useI18n() {
-  const isChromeI18nAvailable = ref(
+  const isChromeI18nAvailable = ref<boolean>(
     typeof chrome !== "undefined" && chrome.i18n !== undefined,
   );
 
-  function getLocaleFile(lang) {
+  function getLocaleFile(lang: string) {
     switch (lang) {
       case "ko":
       case "ko-KR":
@@ -17,7 +19,7 @@ export default function useI18n() {
     }
   }
 
-  function getMessage(key) {
+  function getMessage(key: MessageKey) {
     if (isChromeI18nAvailable.value) {
       return chrome.i18n.getMessage(key);
     } else {

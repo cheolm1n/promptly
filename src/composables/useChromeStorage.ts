@@ -1,17 +1,20 @@
 import { ref } from "vue";
 import useI18n from "./useChromeI18n";
-import { nanoid } from "nanoid";
+import { PromptData } from "../types/prompt";
+import { StoredData } from "../types/storage";
 
 export default function useChromeStorage() {
   const { getLocale } = useI18n();
 
-  const prompts = ref([]);
+  const prompts = ref<PromptData[]>([]);
   const loaded = ref(false);
-  const isChromeStorageAvailable = ref(
+  const isChromeStorageAvailable = ref<boolean>(
     typeof chrome !== "undefined" && chrome.storage !== undefined,
   );
 
-  function get(key) {
+  async function get<K extends keyof StoredData>(
+    key: K,
+  ): Promise<StoredData[K]> {
     return new Promise((resolve, reject) => {
       if (isChromeStorageAvailable.value) {
         chrome.storage.sync.get(key, (result) => {
@@ -23,9 +26,10 @@ export default function useChromeStorage() {
         });
       } else {
         try {
-          const data = {};
-          data[key] = JSON.parse(localStorage.getItem(key));
-          resolve(data[key]);
+          const value = JSON.parse(
+            localStorage.getItem(key) ?? "null",
+          ) as StoredData[K];
+          resolve(value);
         } catch (error) {
           reject(error);
         }
@@ -33,7 +37,7 @@ export default function useChromeStorage() {
     });
   }
 
-  function set(data) {
+  async function set(data: Partial<StoredData>): Promise<void> {
     return new Promise((resolve, reject) => {
       if (isChromeStorageAvailable.value) {
         chrome.storage.sync.set(data, () => {
@@ -46,7 +50,10 @@ export default function useChromeStorage() {
       } else {
         try {
           for (const key in data) {
-            localStorage.setItem(key, JSON.stringify(data[key]));
+            localStorage.setItem(
+              key,
+              JSON.stringify(data[key as keyof StoredData]),
+            );
           }
           resolve();
         } catch (error) {
@@ -65,7 +72,7 @@ export default function useChromeStorage() {
         !hasUsedBefore && (!loadedPrompts || loadedPrompts.length === 0);
       if (isFirstUse) {
         // 첫 사용이고 저장된 프롬프트가 없을 경우 기본 예제 추가
-        let defaultPrompts;
+        let defaultPrompts: PromptData[];
         if (getLocale() === "ko" || getLocale() === "ko-KR") {
           defaultPrompts = [
             {

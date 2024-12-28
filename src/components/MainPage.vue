@@ -12,9 +12,9 @@
         append-to="self"
         filter
         :filter-fields="['title', 'text']"
-        showClear
+        show-clear
       >
-        <template style="flex-direction: column" #option="optionData">
+        <template #option="optionData" style="flex-direction: column">
           <div class="prompt-option">
             <p class="prompt-option-title">
               {{ optionData.option.title }}
@@ -100,13 +100,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { computed, reactive, ref, watch, onMounted } from "vue";
 import { useToast } from "primevue/usetoast";
 import useChromeStorage from "../composables/useChromeStorage";
 import useI18n from "../composables/useChromeI18n";
 import { getStringBytes } from "../utils/stringUtils";
-import { addId, updatePrompt } from "../utils/promptConverter";
+import { addId } from "../utils/promptConverter";
+import { Model, ModelOption, ModelSeparator } from "../types/models";
 
 export default {
   name: "MainPage",
@@ -114,28 +115,35 @@ export default {
     const storage = useChromeStorage();
     const { getMessage } = useI18n();
     const toast = useToast();
-    const selectedPromptId = ref(null);
-    const variables = ref([]);
-    const userInputs = reactive({});
+    const selectedPromptId = ref<string | null>(null);
+    const variables = ref<string[]>([]);
+    const userInputs = reactive<Record<string, string>>({});
     const filledPrompt = ref("");
-    const selectedModel = ref("gpt-4"); // 기본 값 설정
+    const selectedModel = ref<Model>("gpt-4"); // 기본 값 설정
     const urlLengthAlert = ref(false);
 
     // 모델 옵션들
-    const modelOptions = [
-      { label: "ChatGPT 4o", model: "gpt-4o" },
-      { label: "ChatGPT o1", model: "o1" },
-      { label: "ChatGPT o1-mini", model: "o1-mini" },
-      { label: "ChatGPT 4o mini", model: "gpt-4o-mini" },
-      { label: "ChatGPT 4", model: "gpt-4" },
-      { separator: true },
-      { label: "Claude 3.5 Sonnet", model: "Claude 3.5 Sonnet" },
-      { separator: true },
-      { label: "Perplexity", model: "Perplexity" },
-    ].map((option) => ({
-      ...option,
-      command: () => selectModel(option.model), // command를 동적으로 생성
-    }));
+    const modelOptions = (
+      [
+        { label: "ChatGPT 4o", model: "gpt-4o" },
+        { label: "ChatGPT o1", model: "o1" },
+        { label: "ChatGPT o1-mini", model: "o1-mini" },
+        { label: "ChatGPT 4o mini", model: "gpt-4o-mini" },
+        { label: "ChatGPT 4", model: "gpt-4" },
+        { separator: true },
+        { label: "Claude 3.5 Sonnet", model: "Claude 3.5 Sonnet" },
+        { separator: true },
+        { label: "Perplexity", model: "Perplexity" },
+      ] as Array<ModelOption | ModelSeparator>
+    ).map((option) => {
+      if ("separator" in option) {
+        return { separator: true };
+      }
+      return {
+        ...option,
+        command: () => selectModel(option.model), // command를 동적으로 생성
+      };
+    });
 
     // 버튼 클래스 계산
     const getButtonClass = computed(() => {
@@ -150,7 +158,7 @@ export default {
     });
 
     // 모델 선택 함수
-    const selectModel = (model) => {
+    const selectModel = (model: Model): void => {
       storage
         .set({ selectedModel: model })
         .then(() => {
@@ -168,9 +176,11 @@ export default {
     };
 
     // 모델의 라벨을 가져오는 함수
-    const getModelLabel = (model) => {
-      const option = modelOptions.find((option) => option.model === model);
-      return option ? option.label : model;
+    const getModelLabel = (model: Model): string => {
+      const option = modelOptions.find(
+        (option) => "model" in option && option?.model === model,
+      );
+      return option && "label" in option ? option.label : model;
     };
 
     // 컴포넌트가 마운트될 때 모델을 스토리지에서 불러옴
@@ -191,13 +201,13 @@ export default {
       return storage.prompts.value.map(addId);
     });
 
-    function findPromptById(id) {
+    function findPromptById(id: string) {
       return prompts.value.find((prompt) => prompt.id === id);
     }
 
     watch(selectedPromptId, (selectedPromptId) => {
       if (selectedPromptId) {
-        const newPrompt = findPromptById(selectedPromptId).text;
+        const newPrompt = findPromptById(selectedPromptId)?.text ?? "";
         const varMatches = newPrompt.match(/{(.*?)}/g);
         variables.value = varMatches
           ? [...new Set(varMatches.map((v) => v.replace(/[{}]/g, "")))]
@@ -211,7 +221,7 @@ export default {
       }
     });
 
-    function escapeRegExp(string) {
+    function escapeRegExp(string: string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
@@ -235,7 +245,7 @@ export default {
       if (filledPrompt.value) {
         const encodedPrompt = encodeURIComponent(filledPrompt.value);
         const model = selectedModel.value.toLowerCase();
-        let url;
+        let url: string;
 
         if (model.includes("claude")) {
           url = `https://claude.ai/new?q=${encodedPrompt}`;
@@ -258,7 +268,7 @@ export default {
           detail: getMessage("copyToClipboardSuccessMessage"),
           life: 1000,
         });
-      } catch (error) {
+      } catch {
         toast.add({
           severity: "error",
           summary: getMessage("error"),

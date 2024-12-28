@@ -28,5 +28,3 @@ function onClickAddSelectedTextAsPrompt(selectedText) {
     });
   });
 }
-
-export {};

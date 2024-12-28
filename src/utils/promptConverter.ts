@@ -1,5 +1,11 @@
 import { nanoid } from "nanoid";
-import { InitialPromptData, PromptData } from "../types/prompt";
+import {
+  ImportedPromptData,
+  InitialPromptData,
+  PromptData,
+  PromptDataExport,
+  PromptDataSync,
+} from "../types/prompt";
 
 function updateInitialVersion(
   promptData: InitialPromptData,
@@ -31,7 +37,9 @@ export function addId(promptData: PromptData) {
   };
 }
 
-export function convertPromptToExport(promptData: PromptData) {
+export function convertPromptToExport(
+  promptData: PromptData,
+): PromptDataExport {
   // 프롬프트를 export 용으로 변환
   return {
     title: promptData.title,
@@ -39,7 +47,7 @@ export function convertPromptToExport(promptData: PromptData) {
   };
 }
 
-export function convertPromptToStore(promptData: PromptData) {
+export function convertPromptToStore(promptData: PromptData): PromptDataSync {
   // 프롬프트를 저장용으로 변환
   return {
     title: promptData.title,
@@ -48,7 +56,7 @@ export function convertPromptToStore(promptData: PromptData) {
 }
 
 export function convertImportedPrompt(
-  promptData: InitialPromptData | PromptData,
+  promptData: ImportedPromptData,
   idx: number,
 ) {
   // import 된 데이터를 사용할 수 있도록 변환

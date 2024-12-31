@@ -70,7 +70,8 @@ export default function useChromeStorage() {
       const hasUsedBefore = await get("hasUsedBefore");
       const loadedPrompts = await get("prompts");
       const isFirstUse =
-        !hasUsedBefore && (!loadedPrompts || loadedPrompts.length === 0);
+        !hasUsedBefore &&
+        (!loadedPrompts || Object.keys(loadedPrompts).length === 0);
       if (isFirstUse) {
         // 첫 사용이고 저장된 프롬프트가 없을 경우 기본 예제 추가
         let defaultPrompts: PromptData[];
@@ -107,11 +108,7 @@ export default function useChromeStorage() {
         }
         prompts.value = defaultPrompts;
       } else {
-        if (Array.isArray(loadedPrompts)) {
-          prompts.value = loadedPrompts.map(updatePrompt);
-        } else {
-          prompts.value = loadedPrompts ? Object.values(loadedPrompts) : [];
-        }
+        prompts.value = loadedPrompts ? Object.values(loadedPrompts) : [];
       }
       await set({ prompts: prompts.value, hasUsedBefore: true });
       loaded.value = true; // 데이터 로딩 완료 표시

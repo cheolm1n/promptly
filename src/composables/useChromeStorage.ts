@@ -70,7 +70,9 @@ export default function useChromeStorage() {
       const loadedPrompts = await get("prompts");
       const isFirstUse =
         !hasUsedBefore &&
-        (!loadedPrompts || Object.keys(loadedPrompts).length === 0);
+        (!loadedPrompts ||
+          (Array.isArray(loadedPrompts) && loadedPrompts.length === 0) ||
+          Object.keys(loadedPrompts).length === 0);
       if (isFirstUse) {
         // 첫 사용이고 저장된 프롬프트가 없을 경우 기본 예제 추가
         let defaultPrompts: PromptData[];

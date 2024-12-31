@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import MainPage from "./components/MainPage.vue";
 import PromptManagementPage from "./components/PromptManagementPage.vue";
 import { nextTick, onMounted, ref, useTemplateRef } from "vue";
@@ -42,7 +42,7 @@ onMounted(() => {
       if (msg.type === "addPrompt" && msg.data !== "") {
         activeIndex.value = 1;
         nextTick(() => {
-          promptManagementPage.value.handleAddPromptFromContext(msg.data);
+          promptManagementPage.value?.handleAddPromptFromContext(msg.data);
         });
       }
     });

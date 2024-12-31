@@ -18,6 +18,7 @@ import {
   Toast,
   SplitButton,
   Message,
+  Menu,
 } from "primevue";
 import { definePreset } from "@primevue/themes";
 
@@ -56,6 +57,7 @@ app.component("Dialog", Dialog);
 app.component("Toast", Toast);
 app.component("SplitButton", SplitButton);
 app.component("Message", Message);
+app.component("Menu", Menu);
 /* eslint-enable */
 
 app.mount("#app");

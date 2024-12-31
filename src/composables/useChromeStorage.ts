@@ -1,17 +1,21 @@
 import { ref } from "vue";
 import useI18n from "./useChromeI18n";
-import { nanoid } from "nanoid";
+import { PromptData } from "../types/prompt";
+import { StoredData } from "../types/storage";
+import { updatePrompt } from "../utils/promptConverter";
 
 export default function useChromeStorage() {
   const { getLocale } = useI18n();
 
-  const prompts = ref([]);
+  const prompts = ref<PromptData[]>([]);
   const loaded = ref(false);
-  const isChromeStorageAvailable = ref(
+  const isChromeStorageAvailable = ref<boolean>(
     typeof chrome !== "undefined" && chrome.storage !== undefined,
   );
 
-  function get(key) {
+  async function get<K extends keyof StoredData>(
+    key: K,
+  ): Promise<StoredData[K]> {
     return new Promise((resolve, reject) => {
       if (isChromeStorageAvailable.value) {
         chrome.storage.sync.get(key, (result) => {
@@ -23,9 +27,10 @@ export default function useChromeStorage() {
         });
       } else {
         try {
-          const data = {};
-          data[key] = JSON.parse(localStorage.getItem(key));
-          resolve(data[key]);
+          const value = JSON.parse(
+            localStorage.getItem(key) ?? "null",
+          ) as StoredData[K];
+          resolve(value);
         } catch (error) {
           reject(error);
         }
@@ -33,7 +38,7 @@ export default function useChromeStorage() {
     });
   }
 
-  function set(data) {
+  async function set(data: Partial<StoredData>): Promise<void> {
     return new Promise((resolve, reject) => {
       if (isChromeStorageAvailable.value) {
         chrome.storage.sync.set(data, () => {
@@ -46,7 +51,10 @@ export default function useChromeStorage() {
       } else {
         try {
           for (const key in data) {
-            localStorage.setItem(key, JSON.stringify(data[key]));
+            localStorage.setItem(
+              key,
+              JSON.stringify(data[key as keyof StoredData]),
+            );
           }
           resolve();
         } catch (error) {
@@ -62,10 +70,13 @@ export default function useChromeStorage() {
       const hasUsedBefore = await get("hasUsedBefore");
       const loadedPrompts = await get("prompts");
       const isFirstUse =
-        !hasUsedBefore && (!loadedPrompts || loadedPrompts.length === 0);
+        !hasUsedBefore &&
+        (!loadedPrompts ||
+          (Array.isArray(loadedPrompts) && loadedPrompts.length === 0) ||
+          Object.keys(loadedPrompts).length === 0);
       if (isFirstUse) {
         // 첫 사용이고 저장된 프롬프트가 없을 경우 기본 예제 추가
-        let defaultPrompts;
+        let defaultPrompts: PromptData[];
         if (getLocale() === "ko" || getLocale() === "ko-KR") {
           defaultPrompts = [
             {
@@ -98,14 +109,12 @@ export default function useChromeStorage() {
           ];
         }
         prompts.value = defaultPrompts;
-        await set({ prompts: defaultPrompts, hasUsedBefore: true });
       } else {
-        if (Array.isArray(loadedPrompts)) {
-          prompts.value = loadedPrompts;
-        } else {
-          prompts.value = loadedPrompts ? Object.values(loadedPrompts) : [];
-        }
+        prompts.value = (loadedPrompts ? Object.values(loadedPrompts) : []).map(
+          updatePrompt,
+        );
       }
+      await set({ prompts: prompts.value, hasUsedBefore: true });
       loaded.value = true; // 데이터 로딩 완료 표시
     } catch (error) {
       console.error("Failed to load prompts:", error);

@@ -11,7 +11,7 @@
       cols="30"
       :placeholder="getMessage('addPromptLabelPlaceholder')"
       class="textarea"
-      autoResize
+      auto-resize
     />
     <div class="button-group">
       <Button
@@ -24,7 +24,7 @@
         icon="pi pi-bars"
         class="hamburger-button"
         :aria-label="getMessage('menuLabel')"
-        @click="$refs.menu.toggle($event)"
+        @click="$refs.menu?.toggle($event)"
       />
     </div>
 
@@ -67,7 +67,7 @@
       >
         <div class="prompt-content">
           <div v-if="editingIndex === index" class="edit-mode">
-            <InputText class="title-edit" v-model="editedTitle" />
+            <InputText v-model="editedTitle" class="title-edit" />
             <Textarea
               v-model="editedPrompt"
               rows="3"
@@ -147,11 +147,9 @@
   </div>
 </template>
 
-<script>
-import { ref } from "vue";
+<script lang="ts">
+import { ref, useTemplateRef } from "vue";
 import { useToast } from "primevue/usetoast";
-import Menu from "primevue/menu";
-import Dialog from "primevue/dialog";
 import useChromeStorage from "../composables/useChromeStorage";
 import useI18n from "../composables/useChromeI18n";
 import {
@@ -162,13 +160,14 @@ import {
   updatePrompt,
 } from "../utils/promptConverter";
 import { nanoid } from "nanoid";
+import {
+  InitialPromptData,
+  PromptData,
+  PromptDataWithId,
+} from "../types/prompt";
 
 export default {
   name: "PromptManagementPage",
-  components: {
-    Menu,
-    Dialog,
-  },
   setup() {
     const storage = useChromeStorage();
     const { getMessage } = useI18n();
@@ -177,19 +176,18 @@ export default {
     const editedTitle = ref("");
     const editedPrompt = ref("");
     const editingIndex = ref(-1);
-    const fileInput = ref(null);
+    const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
     const dialogVisible = ref(false);
-    const importedPrompts = ref([]);
+    const importedPrompts = ref<Array<InitialPromptData | PromptData>>([]);
     const hoveredIndex = ref(-1);
 
     const toast = useToast();
 
-    // 프롬프트 데이터 구조를 [{ id, text }] 형태로 변경
-    const prompts = ref([]);
+    const prompts = ref<PromptDataWithId[]>([]);
 
     // 데이터 로드 완료 상태
     storage.loadPrompts().then(() => {
-      prompts.value = storage.prompts.value.map(updatePrompt);
+      prompts.value = storage.prompts.value.map(updatePrompt).map(addId);
     });
 
     const menuItems = [
@@ -201,7 +199,7 @@ export default {
       {
         label: getMessage("importPrompt"),
         icon: "pi pi-upload",
-        command: () => fileInput.value.click(),
+        command: () => fileInput.value?.click(),
       },
     ];
 
@@ -227,13 +225,13 @@ export default {
       }
     };
 
-    const editPrompt = (index) => {
+    const editPrompt = (index: number) => {
       editingIndex.value = index;
       editedPrompt.value = prompts.value[index].text;
       editedTitle.value = prompts.value[index].title;
     };
 
-    const saveEditedPrompt = (index) => {
+    const saveEditedPrompt = (index: number) => {
       if (editingIndex.value > -1 && editedPrompt.value.trim()) {
         const updatedPrompt = {
           ...prompts.value[index],
@@ -261,7 +259,7 @@ export default {
       editedTitle.value = ""; // 수정 중인 프롬프트 초기화
     };
 
-    const deletePrompt = (index) => {
+    const deletePrompt = (index: number) => {
       const newPrompts = prompts.value.slice();
       newPrompts.splice(index, 1);
 
@@ -275,7 +273,7 @@ export default {
         });
     };
 
-    const duplicatePrompt = (index) => {
+    const duplicatePrompt = (index: number) => {
       const promptToDuplicate = {
         ...prompts.value[index],
         id: nanoid(),
@@ -314,20 +312,24 @@ export default {
       URL.revokeObjectURL(url);
     };
 
-    const onFileChange = (event) => {
-      const file = event.target.files[0];
+    const onFileChange = (event: Event) => {
+      const input = event.target as HTMLInputElement;
+      const file = input.files?.[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = (e: ProgressEvent<FileReader>) => {
           try {
-            const parsedPrompts = JSON.parse(e.target.result);
+            if (!e.target?.result) {
+              throw new Error("No result");
+            }
+            const parsedPrompts = JSON.parse(e.target.result as string);
             if (Array.isArray(parsedPrompts)) {
               importedPrompts.value = parsedPrompts;
               dialogVisible.value = true; // 대화창 표시
             } else {
               throw new Error("Invalid format");
             }
-          } catch (error) {
+          } catch {
             toast.add({
               severity: "error",
               summary: getMessage("error"),
@@ -339,7 +341,7 @@ export default {
         reader.readAsText(file);
       }
       // 파일 입력 요소 초기화
-      event.target.value = null;
+      input.value = null;
     };
 
     const overwritePrompts = () => {
@@ -375,7 +377,7 @@ export default {
       dialogVisible.value = false;
     };
 
-    const movePromptUp = (index) => {
+    const movePromptUp = (index: number) => {
       if (index > 0) {
         const newPrompts = prompts.value.slice();
         [newPrompts[index - 1], newPrompts[index]] = [
@@ -397,7 +399,7 @@ export default {
       }
     };
 
-    const movePromptDown = (index) => {
+    const movePromptDown = (index: number) => {
       if (index < prompts.value.length - 1) {
         const newPrompts = prompts.value.slice();
         [newPrompts[index], newPrompts[index + 1]] = [
@@ -419,7 +421,10 @@ export default {
       }
     };
 
-    const updateStorePrompts = async (newPrompts, message) => {
+    const updateStorePrompts = async (
+      newPrompts: PromptData[],
+      message?: string,
+    ) => {
       const promptsTexts = newPrompts.map(convertPromptToStore);
       try {
         await storage.set({ prompts: promptsTexts });
@@ -444,7 +449,7 @@ export default {
       }
     };
 
-    function handleAddPromptFromContext(prompt) {
+    function handleAddPromptFromContext(prompt: string) {
       storage.loadPrompts().then(() => {
         newPrompt.value = prompt;
       });

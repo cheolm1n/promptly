@@ -2,6 +2,7 @@ import { ref } from "vue";
 import useI18n from "./useChromeI18n";
 import { PromptData } from "../types/prompt";
 import { StoredData } from "../types/storage";
+import { updatePrompt } from "../utils/promptConverter";
 
 export default function useChromeStorage() {
   const { getLocale } = useI18n();
@@ -109,7 +110,9 @@ export default function useChromeStorage() {
         }
         prompts.value = defaultPrompts;
       } else {
-        prompts.value = loadedPrompts ? Object.values(loadedPrompts) : [];
+        prompts.value = (loadedPrompts ? Object.values(loadedPrompts) : []).map(
+          updatePrompt,
+        );
       }
       await set({ prompts: prompts.value, hasUsedBefore: true });
       loaded.value = true; // 데이터 로딩 완료 표시

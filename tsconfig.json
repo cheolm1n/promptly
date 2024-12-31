@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true, // js도 컴파일
+    "target": "esnext", // 컴파일 결과 js 버전 (vite로 빌드하므로 영향x, 최신문법 에러없이 사용하기 위해 추가)
     "lib": ["dom", "esnext"], // 브라우저 환경에서 사용할 수 있는 라이브러리
     "strict": true, // 엄격한 타입 검사
     "declaration": false, // .d.ts 파일 생성 여부

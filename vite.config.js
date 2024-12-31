@@ -20,6 +20,7 @@ export default defineConfig({
     },
   },
   build: {
+    target: "ESNext",
     rollupOptions: {
       input: "index.html",
     },

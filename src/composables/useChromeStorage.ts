@@ -2,7 +2,6 @@ import { ref } from "vue";
 import useI18n from "./useChromeI18n";
 import { PromptData } from "../types/prompt";
 import { StoredData } from "../types/storage";
-import { updatePrompt } from "../utils/promptConverter";
 
 export default function useChromeStorage() {
   const { getLocale } = useI18n();

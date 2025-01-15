@@ -59,7 +59,8 @@ export function convertPromptToStore(
     return promptData;
   }
   return {
-    ...promptData,
+    title: promptData.title,
+    text: promptData.text,
     id: nanoid(),
   };
 }

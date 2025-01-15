@@ -100,202 +100,201 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, reactive, ref, watch, onMounted } from "vue";
+<script setup lang="ts">
+import {
+  computed,
+  reactive,
+  ref,
+  watch,
+  onMounted,
+  defineComponent,
+  nextTick,
+} from "vue";
 import { useToast } from "primevue/usetoast";
 import useChromeStorage from "../composables/useChromeStorage";
 import useI18n from "../composables/useChromeI18n";
 import { getStringBytes } from "../utils/stringUtils";
-import { addId } from "../utils/promptConverter";
 import { Model, ModelOption, ModelSeparator } from "../types/models";
+import { PromptDataWithId } from "../types/prompt";
 
-export default {
-  name: "MainPage",
-  setup() {
-    const storage = useChromeStorage();
-    const { getMessage } = useI18n();
-    const toast = useToast();
-    const selectedPromptId = ref<string | null>(null);
-    const variables = ref<string[]>([]);
-    const userInputs = reactive<Record<string, string>>({});
-    const filledPrompt = ref("");
-    const selectedModel = ref<Model>("gpt-4"); // 기본 값 설정
-    const urlLengthAlert = ref(false);
+defineComponent({ name: "MainPage" });
 
-    // 모델 옵션들
-    const modelOptions = (
-      [
-        { label: "ChatGPT 4o", model: "gpt-4o" },
-        { label: "ChatGPT o1", model: "o1" },
-        { label: "ChatGPT o1-mini", model: "o1-mini" },
-        { label: "ChatGPT 4o mini", model: "gpt-4o-mini" },
-        { label: "ChatGPT 4", model: "gpt-4" },
-        { separator: true },
-        { label: "Claude 3.5 Sonnet", model: "Claude 3.5 Sonnet" },
-        { separator: true },
-        { label: "Perplexity", model: "Perplexity" },
-      ] as Array<ModelOption | ModelSeparator>
-    ).map((option) => {
-      if ("separator" in option) {
-        return { separator: true };
-      }
-      return {
-        ...option,
-        command: () => selectModel(option.model), // command를 동적으로 생성
-      };
+const storage = useChromeStorage();
+const { getMessage } = useI18n();
+const toast = useToast();
+const selectedPromptId = ref<string | null>(null);
+const variables = ref<string[]>([]);
+const userInputs = reactive<Record<string, string>>({});
+const filledPrompt = ref("");
+const selectedModel = ref<Model>("gpt-4"); // 기본 값 설정
+const urlLengthAlert = ref(false);
+
+const prompts = computed(() => {
+  return storage.prompts.value;
+});
+
+// 모델 옵션들
+const modelOptions = (
+  [
+    { label: "ChatGPT 4o", model: "gpt-4o" },
+    { label: "ChatGPT o1", model: "o1" },
+    { label: "ChatGPT o1-mini", model: "o1-mini" },
+    { label: "ChatGPT 4o mini", model: "gpt-4o-mini" },
+    { label: "ChatGPT 4", model: "gpt-4" },
+    { separator: true },
+    { label: "Claude 3.5 Sonnet", model: "Claude 3.5 Sonnet" },
+    { separator: true },
+    { label: "Perplexity", model: "Perplexity" },
+  ] as Array<ModelOption | ModelSeparator>
+).map((option) => {
+  if ("separator" in option) {
+    return { separator: true };
+  }
+  return {
+    ...option,
+    command: () => selectModel(option.model), // command를 동적으로 생성
+  };
+});
+
+// 버튼 클래스 계산
+const getButtonClass = computed(() => {
+  const model = selectedModel.value.toLowerCase();
+  if (model.includes("claude")) {
+    return "p-button-claude";
+  } else if (model.includes("perplexity")) {
+    return "p-button-perplexity";
+  } else {
+    return "p-button-primary";
+  }
+});
+
+// 모델 선택 함수
+const selectModel = (model: Model): void => {
+  storage
+    .set({ selectedModel: model })
+    .then(() => {
+      selectedModel.value = model;
+    })
+    .catch((error) => {
+      console.error("Failed to save selected model:", error);
+      toast.add({
+        severity: "error",
+        summary: getMessage("error"),
+        detail: getMessage("storageSyncErrorMessage"),
+        life: 5000,
+      });
     });
-
-    // 버튼 클래스 계산
-    const getButtonClass = computed(() => {
-      const model = selectedModel.value.toLowerCase();
-      if (model.includes("claude")) {
-        return "p-button-claude";
-      } else if (model.includes("perplexity")) {
-        return "p-button-perplexity";
-      } else {
-        return "p-button-primary";
-      }
-    });
-
-    // 모델 선택 함수
-    const selectModel = (model: Model): void => {
-      storage
-        .set({ selectedModel: model })
-        .then(() => {
-          selectedModel.value = model;
-        })
-        .catch((error) => {
-          console.error("Failed to save selected model:", error);
-          toast.add({
-            severity: "error",
-            summary: getMessage("error"),
-            detail: getMessage("storageSyncErrorMessage"),
-            life: 5000,
-          });
-        });
-    };
-
-    // 모델의 라벨을 가져오는 함수
-    const getModelLabel = (model: Model): string => {
-      const option = modelOptions.find(
-        (option) => "model" in option && option?.model === model,
-      );
-      return option && "label" in option ? option.label : model;
-    };
-
-    // 컴포넌트가 마운트될 때 모델을 스토리지에서 불러옴
-    onMounted(() => {
-      storage
-        .get("selectedModel")
-        .then((model) => {
-          if (model) {
-            selectedModel.value = model;
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to load selected model:", error);
-        });
-    });
-
-    const prompts = computed(() => {
-      return storage.prompts.value.map(addId);
-    });
-
-    function findPromptById(id: string) {
-      return prompts.value.find((prompt) => prompt.id === id);
-    }
-
-    watch(selectedPromptId, (selectedPromptId) => {
-      if (selectedPromptId) {
-        const newPrompt = findPromptById(selectedPromptId)?.text ?? "";
-        const varMatches = newPrompt.match(/{(.*?)}/g);
-        variables.value = varMatches
-          ? [...new Set(varMatches.map((v) => v.replace(/[{}]/g, "")))]
-          : [];
-        variables.value.forEach((variable) => {
-          userInputs[variable] = "";
-        });
-        filledPrompt.value = "";
-      } else {
-        variables.value = [];
-      }
-    });
-
-    function escapeRegExp(string: string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
-    const generatePrompt = () => {
-      if (selectedPromptId.value) {
-        let tempPrompt = findPromptById(selectedPromptId.value)?.text ?? "";
-        variables.value.forEach((variable) => {
-          const value = userInputs[variable] || "";
-          const escapedVariable = escapeRegExp(variable);
-          tempPrompt = tempPrompt.replace(
-            new RegExp(`\\{${escapedVariable}\\}`, "g"),
-            value,
-          );
-        });
-        filledPrompt.value = tempPrompt;
-        urlLengthAlert.value = getStringBytes(tempPrompt) >= 8000;
-      }
-    };
-
-    const chatWithModel = () => {
-      if (filledPrompt.value) {
-        const encodedPrompt = encodeURIComponent(filledPrompt.value);
-        const model = selectedModel.value.toLowerCase();
-        let url: string;
-
-        if (model.includes("claude")) {
-          url = `https://claude.ai/new?q=${encodedPrompt}`;
-        } else if (model.includes("perplexity")) {
-          url = `https://perplexity.ai/search?q=${encodedPrompt}`;
-        } else {
-          url = `https://chat.openai.com/?model=${model}&q=${encodedPrompt}`;
-        }
-
-        window.open(url, "_blank");
-      }
-    };
-
-    const copyToClipboard = async () => {
-      try {
-        await navigator.clipboard.writeText(filledPrompt.value);
-        toast.add({
-          severity: "success",
-          summary: getMessage("success"),
-          detail: getMessage("copyToClipboardSuccessMessage"),
-          life: 1000,
-        });
-      } catch {
-        toast.add({
-          severity: "error",
-          summary: getMessage("error"),
-          detail: getMessage("copyToClipboardErrorMessage"),
-          life: 5000,
-        });
-      }
-    };
-
-    return {
-      prompts,
-      selectedPromptId,
-      variables,
-      userInputs,
-      generatePrompt,
-      filledPrompt,
-      chatWithModel,
-      copyToClipboard,
-      selectedModel,
-      modelOptions,
-      getButtonClass,
-      getModelLabel,
-      getMessage,
-      urlLengthAlert,
-    };
-  },
 };
+
+// 모델의 라벨을 가져오는 함수
+const getModelLabel = (model: Model): string => {
+  const option = modelOptions.find(
+    (option) => "model" in option && option?.model === model,
+  );
+  return option && "label" in option ? option.label : model;
+};
+
+// 컴포넌트가 마운트될 때 모델을 스토리지에서 불러옴
+onMounted(() => {
+  storage
+    .get("selectedModel")
+    .then((model) => {
+      if (model) {
+        selectedModel.value = model;
+      }
+    })
+    .catch((error) => {
+      console.error("Failed to load selected model:", error);
+    });
+});
+
+function findPromptById(id: string) {
+  return prompts.value.find((prompt) => prompt.id === id);
+}
+
+watch(selectedPromptId, (selectedPromptId) => {
+  if (selectedPromptId) {
+    const newPrompt = findPromptById(selectedPromptId)?.text ?? "";
+    const varMatches = newPrompt.match(/{(.*?)}/g);
+    variables.value = varMatches
+      ? [...new Set(varMatches.map((v) => v.replace(/[{}]/g, "")))]
+      : [];
+    variables.value.forEach((variable) => {
+      userInputs[variable] = "";
+    });
+    filledPrompt.value = "";
+  } else {
+    variables.value = [];
+  }
+});
+
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+const generatePrompt = () => {
+  if (selectedPromptId.value) {
+    let tempPrompt = findPromptById(selectedPromptId.value)?.text ?? "";
+    variables.value.forEach((variable) => {
+      const value = userInputs[variable] || "";
+      const escapedVariable = escapeRegExp(variable);
+      tempPrompt = tempPrompt.replace(
+        new RegExp(`\\{${escapedVariable}\\}`, "g"),
+        value,
+      );
+    });
+    filledPrompt.value = tempPrompt;
+    urlLengthAlert.value = getStringBytes(tempPrompt) >= 8000;
+  }
+};
+
+const chatWithModel = () => {
+  if (filledPrompt.value) {
+    const encodedPrompt = encodeURIComponent(filledPrompt.value);
+    const model = selectedModel.value.toLowerCase();
+    let url: string;
+
+    if (model.includes("claude")) {
+      url = `https://claude.ai/new?q=${encodedPrompt}`;
+    } else if (model.includes("perplexity")) {
+      url = `https://perplexity.ai/search?q=${encodedPrompt}`;
+    } else {
+      url = `https://chat.openai.com/?model=${model}&q=${encodedPrompt}`;
+    }
+
+    window.open(url, "_blank");
+  }
+};
+
+const copyToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(filledPrompt.value);
+    toast.add({
+      severity: "success",
+      summary: getMessage("success"),
+      detail: getMessage("copyToClipboardSuccessMessage"),
+      life: 1000,
+    });
+  } catch {
+    toast.add({
+      severity: "error",
+      summary: getMessage("error"),
+      detail: getMessage("copyToClipboardErrorMessage"),
+      life: 5000,
+    });
+  }
+};
+
+const usePrompt = (prompt: PromptDataWithId) => {
+  selectedPromptId.value = prompt.id;
+  setTimeout(() => {
+    generatePrompt();
+  }, 100);
+};
+
+defineExpose({
+  usePrompt,
+});
 </script>
 
 <style scoped>

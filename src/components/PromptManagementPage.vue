@@ -1,5 +1,5 @@
 <template>
-  <div v-if="loaded" class="container">
+  <div v-if="storage.loaded" class="container">
     <InputText
       v-model="newTitle"
       class="new-title-input"
@@ -101,6 +101,12 @@
                   <transition name="fade">
                     <div class="prompt-actions">
                       <Button
+                        icon="pi pi-play"
+                        class="use-button"
+                        :aria-label="getMessage('usePromptLabel')"
+                        @click="usePrompt(index)"
+                      />
+                      <Button
                         icon="pi pi-pencil"
                         class="edit-button"
                         :aria-label="getMessage('editLabel')"
@@ -147,8 +153,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { ref, useTemplateRef } from "vue";
+<script setup lang="ts">
+import { defineComponent, ref, toRaw, useTemplateRef } from "vue";
 import { useToast } from "primevue/usetoast";
 import useChromeStorage from "../composables/useChromeStorage";
 import useI18n from "../composables/useChromeI18n";
@@ -166,325 +172,304 @@ import {
   PromptDataWithId,
 } from "../types/prompt";
 
-export default {
-  name: "PromptManagementPage",
-  setup() {
-    const storage = useChromeStorage();
-    const { getMessage } = useI18n();
-    const newTitle = ref("");
-    const newPrompt = ref("");
-    const editedTitle = ref("");
-    const editedPrompt = ref("");
-    const editingIndex = ref(-1);
-    const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
-    const dialogVisible = ref(false);
-    const importedPrompts = ref<Array<InitialPromptData | PromptData>>([]);
-    const hoveredIndex = ref(-1);
+defineComponent({ name: "PromptManagementPage" });
+const emit = defineEmits<{
+  (e: "usePrompt", payload: PromptDataWithId): void;
+}>();
 
-    const toast = useToast();
+const storage = useChromeStorage();
+const { getMessage } = useI18n();
+const newTitle = ref("");
+const newPrompt = ref("");
+const editedTitle = ref("");
+const editedPrompt = ref("");
+const editingIndex = ref(-1);
+const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
+const dialogVisible = ref(false);
+const importedPrompts = ref<Array<InitialPromptData | PromptData>>([]);
+const hoveredIndex = ref(-1);
 
-    const prompts = ref<PromptDataWithId[]>([]);
+const toast = useToast();
 
-    // 데이터 로드 완료 상태
-    storage.loadPrompts().then(() => {
-      prompts.value = storage.prompts.value.map(updatePrompt).map(addId);
+const prompts = ref<PromptDataWithId[]>([]);
+
+// 데이터 로드 완료 상태
+storage.loadPrompts().then(() => {
+  prompts.value = storage.prompts.value.map(updatePrompt).map(addId);
+});
+
+const menuItems = [
+  {
+    label: getMessage("exportPrompt"),
+    icon: "pi pi-download",
+    command: () => exportPrompts(),
+  },
+  {
+    label: getMessage("importPrompt"),
+    icon: "pi pi-upload",
+    command: () => fileInput.value?.click(),
+  },
+];
+
+const addPrompt = () => {
+  if (newPrompt.value.trim() && newTitle.value.trim()) {
+    const newPromptObj = {
+      id: nanoid(),
+      text: newPrompt.value.trim(),
+      title: newTitle.value.trim(),
+    };
+    const newPrompts = prompts.value.concat(newPromptObj);
+
+    updateStorePrompts(newPrompts, getMessage("addPromptMessage"))
+      .then(() => {
+        prompts.value.push(newPromptObj);
+        console.log("Prompt added successfully");
+      })
+      .catch((error) => {
+        console.error("Failed to add prompt:", error);
+      });
+    newPrompt.value = "";
+    newTitle.value = "";
+  }
+};
+
+const usePrompt = (index: number) => {
+  const prompt = toRaw(prompts.value[index]);
+  emit("usePrompt", prompt);
+};
+
+const editPrompt = (index: number) => {
+  editingIndex.value = index;
+  editedPrompt.value = prompts.value[index].text;
+  editedTitle.value = prompts.value[index].title;
+};
+
+const saveEditedPrompt = (index: number) => {
+  if (editingIndex.value > -1 && editedPrompt.value.trim()) {
+    const updatedPrompt = {
+      ...prompts.value[index],
+      text: editedPrompt.value.trim(),
+      title: editedTitle.value.trim(),
+    };
+    const newPrompts = prompts.value.slice();
+    newPrompts.splice(index, 1, updatedPrompt);
+
+    updateStorePrompts(newPrompts, getMessage("updatePromptMessage"))
+      .then(() => {
+        prompts.value[index] = updatedPrompt;
+        editingIndex.value = -1;
+        console.log("Prompt updated successfully");
+      })
+      .catch((error) => {
+        console.error("Failed to update prompt:", error);
+      });
+  }
+};
+
+const cancelEdit = () => {
+  editingIndex.value = -1; // 편집 모드 종료
+  editedPrompt.value = ""; // 수정 중인 프롬프트 초기화
+  editedTitle.value = ""; // 수정 중인 프롬프트 초기화
+};
+
+const deletePrompt = (index: number) => {
+  const newPrompts = prompts.value.slice();
+  newPrompts.splice(index, 1);
+
+  updateStorePrompts(newPrompts, getMessage("deletePromptMessage"))
+    .then(() => {
+      prompts.value.splice(index, 1);
+      console.log("Prompt deleted successfully");
+    })
+    .catch((error) => {
+      console.error("Failed to delete prompt:", error);
     });
+};
 
-    const menuItems = [
-      {
-        label: getMessage("exportPrompt"),
-        icon: "pi pi-download",
-        command: () => exportPrompts(),
-      },
-      {
-        label: getMessage("importPrompt"),
-        icon: "pi pi-upload",
-        command: () => fileInput.value?.click(),
-      },
+const duplicatePrompt = (index: number) => {
+  const promptToDuplicate = {
+    ...prompts.value[index],
+    id: nanoid(),
+  };
+  const newPrompts = prompts.value.slice();
+  newPrompts.splice(index + 1, 0, promptToDuplicate);
+
+  updateStorePrompts(newPrompts, getMessage("duplicatePromptMessage"))
+    .then(() => {
+      prompts.value.splice(index + 1, 0, promptToDuplicate);
+      console.log("Prompt duplicated successfully");
+    })
+    .catch((error) => {
+      console.error("Failed to duplicate prompt:", error);
+    });
+};
+
+const exportPrompts = () => {
+  const dataStr = JSON.stringify(
+    prompts.value.map(convertPromptToExport),
+    null,
+    2,
+  );
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const now = new Date();
+  const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(
+    now.getDate(),
+  ).padStart(2, "0")}${String(now.getHours()).padStart(2, "0")}${String(
+    now.getMinutes(),
+  ).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`; // 타임스탬프 생성
+  a.href = url;
+  a.download = `prompts_${timestamp}.json`; // 파일 이름에 타임스탬프 추가
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+const showJsonValidationError = () => {
+  toast.add({
+    severity: "error",
+    summary: getMessage("error"),
+    detail: getMessage("jsonValidationErrorMessage"),
+    life: 5000,
+  });
+};
+const onFileChange = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      if (!e.target?.result) {
+        showJsonValidationError();
+        return;
+      }
+      const parsedPrompts = JSON.parse(e.target.result as string);
+      if (!Array.isArray(parsedPrompts)) {
+        showJsonValidationError();
+        return;
+      }
+      importedPrompts.value = parsedPrompts;
+      dialogVisible.value = true; // 대화창 표시
+    };
+    reader.readAsText(file);
+  }
+  // 파일 입력 요소 초기화
+  input.value = null;
+};
+
+const overwritePrompts = () => {
+  const newPrompts = importedPrompts.value
+    .map(convertImportedPrompt)
+    .map(addId);
+
+  updateStorePrompts(newPrompts, getMessage("overwritePromptMessage"))
+    .then(() => {
+      prompts.value = newPrompts;
+      console.log("Prompts overwritten successfully");
+    })
+    .catch((error) => {
+      console.error("Failed to overwrite prompts:", error);
+    });
+  dialogVisible.value = false;
+};
+
+const appendPrompts = () => {
+  const importedWithIds = importedPrompts.value
+    .map(convertImportedPrompt)
+    .map(addId);
+  const newPrompts = prompts.value.concat(importedWithIds);
+
+  updateStorePrompts(newPrompts, getMessage("appendPromptMessage"))
+    .then(() => {
+      prompts.value = newPrompts;
+      console.log("Prompts appended successfully");
+    })
+    .catch((error) => {
+      console.error("Failed to append prompts:", error);
+    });
+  dialogVisible.value = false;
+};
+
+const movePromptUp = (index: number) => {
+  if (index > 0) {
+    const newPrompts = prompts.value.slice();
+    [newPrompts[index - 1], newPrompts[index]] = [
+      newPrompts[index],
+      newPrompts[index - 1],
     ];
 
-    const addPrompt = () => {
-      if (newPrompt.value.trim() && newTitle.value.trim()) {
-        const newPromptObj = {
-          id: nanoid(),
-          text: newPrompt.value.trim(),
-          title: newTitle.value.trim(),
-        };
-        const newPrompts = prompts.value.concat(newPromptObj);
-
-        updateStorePrompts(newPrompts, getMessage("addPromptMessage"))
-          .then(() => {
-            prompts.value.push(newPromptObj);
-            console.log("Prompt added successfully");
-          })
-          .catch((error) => {
-            console.error("Failed to add prompt:", error);
-          });
-        newPrompt.value = "";
-        newTitle.value = "";
-      }
-    };
-
-    const editPrompt = (index: number) => {
-      editingIndex.value = index;
-      editedPrompt.value = prompts.value[index].text;
-      editedTitle.value = prompts.value[index].title;
-    };
-
-    const saveEditedPrompt = (index: number) => {
-      if (editingIndex.value > -1 && editedPrompt.value.trim()) {
-        const updatedPrompt = {
-          ...prompts.value[index],
-          text: editedPrompt.value.trim(),
-          title: editedTitle.value.trim(),
-        };
-        const newPrompts = prompts.value.slice();
-        newPrompts.splice(index, 1, updatedPrompt);
-
-        updateStorePrompts(newPrompts, getMessage("updatePromptMessage"))
-          .then(() => {
-            prompts.value[index] = updatedPrompt;
-            editingIndex.value = -1;
-            console.log("Prompt updated successfully");
-          })
-          .catch((error) => {
-            console.error("Failed to update prompt:", error);
-          });
-      }
-    };
-
-    const cancelEdit = () => {
-      editingIndex.value = -1; // 편집 모드 종료
-      editedPrompt.value = ""; // 수정 중인 프롬프트 초기화
-      editedTitle.value = ""; // 수정 중인 프롬프트 초기화
-    };
-
-    const deletePrompt = (index: number) => {
-      const newPrompts = prompts.value.slice();
-      newPrompts.splice(index, 1);
-
-      updateStorePrompts(newPrompts, getMessage("deletePromptMessage"))
-        .then(() => {
-          prompts.value.splice(index, 1);
-          console.log("Prompt deleted successfully");
-        })
-        .catch((error) => {
-          console.error("Failed to delete prompt:", error);
-        });
-    };
-
-    const duplicatePrompt = (index: number) => {
-      const promptToDuplicate = {
-        ...prompts.value[index],
-        id: nanoid(),
-      };
-      const newPrompts = prompts.value.slice();
-      newPrompts.splice(index + 1, 0, promptToDuplicate);
-
-      updateStorePrompts(newPrompts, getMessage("duplicatePromptMessage"))
-        .then(() => {
-          prompts.value.splice(index + 1, 0, promptToDuplicate);
-          console.log("Prompt duplicated successfully");
-        })
-        .catch((error) => {
-          console.error("Failed to duplicate prompt:", error);
-        });
-    };
-
-    const exportPrompts = () => {
-      const dataStr = JSON.stringify(
-        prompts.value.map(convertPromptToExport),
-        null,
-        2,
-      );
-      const blob = new Blob([dataStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const now = new Date();
-      const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(
-        now.getDate(),
-      ).padStart(2, "0")}${String(now.getHours()).padStart(2, "0")}${String(
-        now.getMinutes(),
-      ).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`; // 타임스탬프 생성
-      a.href = url;
-      a.download = `prompts_${timestamp}.json`; // 파일 이름에 타임스탬프 추가
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-
-    const onFileChange = (event: Event) => {
-      const input = event.target as HTMLInputElement;
-      const file = input.files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e: ProgressEvent<FileReader>) => {
-          try {
-            if (!e.target?.result) {
-              throw new Error("No result");
-            }
-            const parsedPrompts = JSON.parse(e.target.result as string);
-            if (Array.isArray(parsedPrompts)) {
-              importedPrompts.value = parsedPrompts;
-              dialogVisible.value = true; // 대화창 표시
-            } else {
-              throw new Error("Invalid format");
-            }
-          } catch {
-            toast.add({
-              severity: "error",
-              summary: getMessage("error"),
-              detail: getMessage("jsonValidationErrorMessage"),
-              life: 5000,
-            });
-          }
-        };
-        reader.readAsText(file);
-      }
-      // 파일 입력 요소 초기화
-      input.value = null;
-    };
-
-    const overwritePrompts = () => {
-      const newPrompts = importedPrompts.value
-        .map(convertImportedPrompt)
-        .map(addId);
-
-      updateStorePrompts(newPrompts, getMessage("overwritePromptMessage"))
-        .then(() => {
-          prompts.value = newPrompts;
-          console.log("Prompts overwritten successfully");
-        })
-        .catch((error) => {
-          console.error("Failed to overwrite prompts:", error);
-        });
-      dialogVisible.value = false;
-    };
-
-    const appendPrompts = () => {
-      const importedWithIds = importedPrompts.value
-        .map(convertImportedPrompt)
-        .map(addId);
-      const newPrompts = prompts.value.concat(importedWithIds);
-
-      updateStorePrompts(newPrompts, getMessage("appendPromptMessage"))
-        .then(() => {
-          prompts.value = newPrompts;
-          console.log("Prompts appended successfully");
-        })
-        .catch((error) => {
-          console.error("Failed to append prompts:", error);
-        });
-      dialogVisible.value = false;
-    };
-
-    const movePromptUp = (index: number) => {
-      if (index > 0) {
-        const newPrompts = prompts.value.slice();
-        [newPrompts[index - 1], newPrompts[index]] = [
-          newPrompts[index],
-          newPrompts[index - 1],
+    updateStorePrompts(newPrompts)
+      .then(() => {
+        [prompts.value[index - 1], prompts.value[index]] = [
+          prompts.value[index],
+          prompts.value[index - 1],
         ];
+        console.log("Prompt moved up successfully");
+      })
+      .catch((error) => {
+        console.error("Failed to move prompt up:", error);
+      });
+  }
+};
 
-        updateStorePrompts(newPrompts)
-          .then(() => {
-            [prompts.value[index - 1], prompts.value[index]] = [
-              prompts.value[index],
-              prompts.value[index - 1],
-            ];
-            console.log("Prompt moved up successfully");
-          })
-          .catch((error) => {
-            console.error("Failed to move prompt up:", error);
-          });
-      }
-    };
+const movePromptDown = (index: number) => {
+  if (index < prompts.value.length - 1) {
+    const newPrompts = prompts.value.slice();
+    [newPrompts[index], newPrompts[index + 1]] = [
+      newPrompts[index + 1],
+      newPrompts[index],
+    ];
 
-    const movePromptDown = (index: number) => {
-      if (index < prompts.value.length - 1) {
-        const newPrompts = prompts.value.slice();
-        [newPrompts[index], newPrompts[index + 1]] = [
-          newPrompts[index + 1],
-          newPrompts[index],
+    updateStorePrompts(newPrompts)
+      .then(() => {
+        [prompts.value[index], prompts.value[index + 1]] = [
+          prompts.value[index + 1],
+          prompts.value[index],
         ];
+        console.log("Prompt moved down successfully");
+      })
+      .catch((error) => {
+        console.error("Failed to move prompt down:", error);
+      });
+  }
+};
 
-        updateStorePrompts(newPrompts)
-          .then(() => {
-            [prompts.value[index], prompts.value[index + 1]] = [
-              prompts.value[index + 1],
-              prompts.value[index],
-            ];
-            console.log("Prompt moved down successfully");
-          })
-          .catch((error) => {
-            console.error("Failed to move prompt down:", error);
-          });
-      }
-    };
-
-    const updateStorePrompts = async (
-      newPrompts: PromptData[],
-      message?: string,
-    ) => {
-      const promptsTexts = newPrompts.map(convertPromptToStore);
-      try {
-        await storage.set({ prompts: promptsTexts });
-        storage.prompts.value = promptsTexts;
-        if (message) {
-          toast.add({
-            severity: "success",
-            summary: getMessage("success"),
-            detail: message,
-            life: 1000,
-          });
-        }
-      } catch (error) {
-        console.error("Storage set error:", error);
-        toast.add({
-          severity: "error",
-          summary: getMessage("error"),
-          detail: getMessage("storageSyncErrorMessage"),
-          life: 5000,
-        });
-        throw error;
-      }
-    };
-
-    function handleAddPromptFromContext(prompt: string) {
-      storage.loadPrompts().then(() => {
-        newPrompt.value = prompt;
+const updateStorePrompts = async (
+  newPrompts: PromptData[],
+  message?: string,
+) => {
+  const promptsTexts = newPrompts.map(convertPromptToStore);
+  try {
+    await storage.set({ prompts: promptsTexts });
+    if (message) {
+      toast.add({
+        severity: "success",
+        summary: getMessage("success"),
+        detail: message,
+        life: 1000,
       });
     }
-
-    return {
-      prompts,
-      newTitle,
-      newPrompt,
-      addPrompt,
-      editPrompt,
-      saveEditedPrompt,
-      cancelEdit,
-      deletePrompt,
-      duplicatePrompt,
-      exportPrompts,
-      onFileChange,
-      overwritePrompts,
-      appendPrompts,
-      editedTitle,
-      editedPrompt,
-      editingIndex,
-      menuItems,
-      fileInput,
-      dialogVisible,
-      importedPrompts,
-      movePromptUp,
-      movePromptDown,
-      hoveredIndex,
-      loaded: storage.loaded,
-      getMessage,
-      handleAddPromptFromContext,
-    };
-  },
+  } catch (error) {
+    console.error("Storage set error:", error);
+    toast.add({
+      severity: "error",
+      summary: getMessage("error"),
+      detail: getMessage("storageSyncErrorMessage"),
+      life: 5000,
+    });
+    throw error;
+  }
 };
+
+function handleAddPromptFromContext(prompt: string) {
+  storage.loadPrompts().then(() => {
+    newPrompt.value = prompt;
+  });
+}
+
+defineExpose({
+  handleAddPromptFromContext,
+});
 </script>
 
 <style scoped>
@@ -585,7 +570,7 @@ export default {
 
 .prompt-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;

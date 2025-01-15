@@ -1,8 +1,8 @@
-import { PromptData } from "./prompt";
+import { PromptDataWithId } from "./prompt";
 import { Model } from "./models";
 
 export type StoredData = {
-  prompts?: PromptData[] | Record<number, PromptData>;
+  prompts?: PromptDataWithId[] | Record<number, PromptDataWithId>;
   selectedModel?: Model;
   hasUsedBefore?: boolean;
 };

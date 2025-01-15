@@ -5,6 +5,7 @@ import {
   PromptData,
   PromptDataExport,
   PromptDataSync,
+  PromptDataWithId,
 } from "../types/prompt";
 
 function updateInitialVersion(
@@ -30,7 +31,10 @@ export function updatePrompt(
   return promptData;
 }
 
-export function addId(promptData: PromptData) {
+export function addId(promptData: PromptData | PromptDataWithId) {
+  if ("id" in promptData) {
+    return promptData;
+  }
   return {
     ...promptData,
     id: nanoid(),
@@ -47,11 +51,16 @@ export function convertPromptToExport(
   };
 }
 
-export function convertPromptToStore(promptData: PromptData): PromptDataSync {
+export function convertPromptToStore(
+  promptData: PromptData | PromptDataWithId,
+): PromptDataSync {
   // 프롬프트를 저장용으로 변환
+  if ("id" in promptData) {
+    return promptData;
+  }
   return {
-    title: promptData.title,
-    text: promptData.text,
+    ...promptData,
+    id: nanoid(),
   };
 }
 

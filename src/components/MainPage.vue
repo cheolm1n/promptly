@@ -211,8 +211,9 @@ function findPromptById(id: string) {
   return prompts.value.find((prompt) => prompt.id === id);
 }
 
-watch(selectedPromptId, (selectedPromptId) => {
+watch(selectedPromptId, async (selectedPromptId) => {
   if (selectedPromptId) {
+    await storage.loadPrompts();
     const newPrompt = findPromptById(selectedPromptId)?.text ?? "";
     const varMatches = newPrompt.match(/{(.*?)}/g);
     variables.value = varMatches

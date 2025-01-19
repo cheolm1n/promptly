@@ -108,7 +108,6 @@ import {
   watch,
   onMounted,
   defineComponent,
-  nextTick,
 } from "vue";
 import { useToast } from "primevue/usetoast";
 import useChromeStorage from "../composables/useChromeStorage";

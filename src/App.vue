@@ -19,7 +19,7 @@
     </div>
   </div>
   <div class="tab-content">
-    <MainPage v-if="activeIndex === 0" ref="MainPage" />
+    <MainPage v-if="activeIndex === 0" ref="mainPage" />
     <PromptManagementPage
       v-else
       ref="promptManagementPage"
@@ -36,7 +36,7 @@ import { PromptDataWithId } from "./types/prompt";
 
 const activeIndex = ref(0);
 const promptManagementPage = useTemplateRef("promptManagementPage");
-const mainPage = useTemplateRef("MainPage");
+const mainPage = useTemplateRef("mainPage");
 
 const isChromeRuntimeAvailable = ref(
   typeof chrome !== "undefined" && chrome.runtime !== undefined,

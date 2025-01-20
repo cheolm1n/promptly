@@ -287,9 +287,6 @@ const copyToClipboard = async () => {
 
 const usePrompt = (prompt: PromptDataWithId) => {
   selectedPromptId.value = prompt.id;
-  setTimeout(() => {
-    generatePrompt();
-  }, 100);
 };
 
 defineExpose({

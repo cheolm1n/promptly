@@ -1,13 +1,13 @@
 import { ref } from "vue";
 import useI18n from "./useChromeI18n";
-import { PromptData } from "../types/prompt";
+import { PromptData, PromptDataWithId } from "../types/prompt";
 import { StoredData } from "../types/storage";
-import { updatePrompt } from "../utils/promptConverter";
+import { addId, updatePrompt } from "../utils/promptConverter";
 
 export default function useChromeStorage() {
   const { getLocale } = useI18n();
 
-  const prompts = ref<PromptData[]>([]);
+  const prompts = ref<PromptDataWithId[]>([]);
   const loaded = ref(false);
   const isChromeStorageAvailable = ref<boolean>(
     typeof chrome !== "undefined" && chrome.storage !== undefined,
@@ -56,6 +56,7 @@ export default function useChromeStorage() {
               JSON.stringify(data[key as keyof StoredData]),
             );
           }
+          loadPrompts();
           resolve();
         } catch (error) {
           reject(error);
@@ -108,11 +109,11 @@ export default function useChromeStorage() {
             },
           ];
         }
-        prompts.value = defaultPrompts;
+        prompts.value = defaultPrompts.map(addId);
       } else {
-        prompts.value = (loadedPrompts ? Object.values(loadedPrompts) : []).map(
-          updatePrompt,
-        );
+        prompts.value = (loadedPrompts ? Object.values(loadedPrompts) : [])
+          .map(updatePrompt)
+          .map(addId);
       }
       await set({ prompts: prompts.value, hasUsedBefore: true });
       loaded.value = true; // 데이터 로딩 완료 표시

@@ -7,6 +7,7 @@ export type PromptData = {
 export type PromptDataWithId = PromptData & { id: string };
 export type PromptDataSync = {
   // 저장용 prompt 데이터 type
+  id: string;
   title: string;
   text: string;
 };

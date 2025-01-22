@@ -19,8 +19,12 @@
     </div>
   </div>
   <div class="tab-content">
-    <MainPage v-if="activeIndex === 0" />
-    <PromptManagementPage v-else ref="promptManagementPage" />
+    <MainPage v-if="activeIndex === 0" ref="mainPage" />
+    <PromptManagementPage
+      v-else
+      ref="promptManagementPage"
+      @use-prompt="onUsePrompt"
+    />
   </div>
 </template>
 
@@ -28,13 +32,24 @@
 import MainPage from "./components/MainPage.vue";
 import PromptManagementPage from "./components/PromptManagementPage.vue";
 import { nextTick, onMounted, ref, useTemplateRef } from "vue";
+import { PromptDataWithId } from "./types/prompt";
 
 const activeIndex = ref(0);
 const promptManagementPage = useTemplateRef("promptManagementPage");
+const mainPage = useTemplateRef("mainPage");
 
 const isChromeRuntimeAvailable = ref(
   typeof chrome !== "undefined" && chrome.runtime !== undefined,
 );
+
+function onUsePrompt(prompt: PromptDataWithId) {
+  activeIndex.value = 0;
+  nextTick(() => {
+    if (mainPage.value) {
+      mainPage.value.usePrompt(prompt);
+    }
+  });
+}
 
 onMounted(() => {
   if (isChromeRuntimeAvailable.value) {

@@ -115,5 +115,17 @@
     },
     "contextMenuAddSelectedTextAsPrompt": {
         "message": "Add selected text as a prompt"
+    },
+    "footerReleaseNote": {
+        "message" : "Release Note"
+    },
+    "footerCredits": {
+        "message" : "Credits"
+    },
+    "footerGithub": {
+        "message" : "GitHub Repo"
+    },
+    "footerSupportHub": {
+        "message" : "Support Hub"
     }
 }

@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import {createApp} from "vue";
 import App from "./App.vue";
 import PrimeVue from "primevue/config";
 import Aura from "@primevue/themes/Aura";
@@ -8,43 +8,32 @@ import "./style.css";
 import "primeicons/primeicons.css";
 
 // PrimeVue 컴포넌트 등록
-import {
-  Button,
-  InputText,
-  Textarea,
-  Select,
-  Dialog,
-  ToastService,
-  Toast,
-  SplitButton,
-  Message,
-  Menu,
-} from "primevue";
-import { definePreset } from "@primevue/themes";
+import {Button, Dialog, InputText, Menu, Message, Select, SplitButton, Textarea, Toast, ToastService, Tooltip,} from "primevue";
+import {definePreset} from "@primevue/themes";
 
 const app = createApp(App);
 
 const preset = definePreset(Aura, {
-  semantic: {
-    primary: {
-      50: "{sky.50}",
-      100: "{sky.100}",
-      200: "{sky.200}",
-      300: "{sky.300}",
-      400: "{sky.400}",
-      500: "{sky.500}",
-      600: "{sky.600}",
-      700: "{sky.700}",
-      800: "{sky.800}",
-      900: "{sky.900}",
-      950: "{sky.950}",
+    semantic: {
+        primary: {
+            50: "{sky.50}",
+            100: "{sky.100}",
+            200: "{sky.200}",
+            300: "{sky.300}",
+            400: "{sky.400}",
+            500: "{sky.500}",
+            600: "{sky.600}",
+            700: "{sky.700}",
+            800: "{sky.800}",
+            900: "{sky.900}",
+            950: "{sky.950}",
+        },
     },
-  },
 });
 app.use(PrimeVue, {
-  theme: {
-    preset: preset,
-  },
+    theme: {
+        preset: preset,
+    },
 });
 app.use(ToastService);
 
@@ -58,6 +47,7 @@ app.component("Toast", Toast);
 app.component("SplitButton", SplitButton);
 app.component("Message", Message);
 app.component("Menu", Menu);
+app.directive("Tooltip", Tooltip);
 /* eslint-enable */
 
 app.mount("#app");

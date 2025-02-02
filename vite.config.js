@@ -2,6 +2,8 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { createHtmlPlugin } from "vite-plugin-html";
 import path from "path";
+import { version } from "./package.json";
+
 
 export default defineConfig({
   plugins: [
@@ -30,5 +32,8 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["primevue"],
+  },
+  define: {
+    __APP_VERSION__: JSON.stringify(version),
   },
 });

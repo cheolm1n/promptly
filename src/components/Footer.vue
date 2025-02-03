@@ -90,7 +90,6 @@ const appVersion = __APP_VERSION__;
 .footer-link {
   color: #666;
   text-decoration: none;
-  font-size: 1.2rem; /* 아이콘 크기 */
 }
 
 .footer-link:hover {

@@ -6,11 +6,11 @@
         <span class="footer-link"> promptly v{{ appVersion }} </span>
         <!-- 릴리즈 노트 아이콘 -->
         <a
+          v-tooltip.top="getMessage('footerReleaseNote')"
           href="https://github.com/cheolm1n/promptly/releases"
           target="_blank"
           rel="noopener noreferrer"
           class="footer-link"
-          v-tooltip.top="getMessage('footerReleaseNote')"
         >
           <i class="pi pi-info-circle icon"></i>
         </a>
@@ -18,33 +18,33 @@
       <div class="footer-right">
         <!-- 만든이들 아이콘 -->
         <a
+          v-tooltip.top="getMessage('footerCredits')"
           href="https://sites.google.com/view/promptly-credits"
           target="_blank"
           rel="noopener noreferrer"
           class="footer-link"
-          v-tooltip.top="getMessage('footerCredits')"
         >
           <i class="pi pi-id-card icon"></i>
         </a>
 
         <!-- 깃헙 아이콘 -->
         <a
+          v-tooltip.top="getMessage('footerGithub')"
           href="https://github.com/cheolm1n/promptly"
           target="_blank"
           rel="noopener noreferrer"
           class="footer-link"
-          v-tooltip.top="getMessage('footerGithub')"
         >
           <i class="pi pi-github icon"></i>
         </a>
 
         <!-- 지원 허브 (Chrome Web Store) 아이콘 -->
         <a
+          v-tooltip.top="getMessage('footerSupportHub')"
           href="https://chromewebstore.google.com/detail/bkbcjoofjhapaicbfnmalldjahceecjd/support"
           target="_blank"
           rel="noopener noreferrer"
           class="footer-link"
-          v-tooltip.top="getMessage('footerSupportHub')"
         >
           <i class="pi pi-flag icon"></i>
         </a>
@@ -102,7 +102,7 @@ const appVersion = __APP_VERSION__;
 
 @media (prefers-color-scheme: dark) {
   .app-footer {
-    background-color: #0f0f0f;
+    background-color: #121212;
   }
   .footer-link:hover {
     color: #888;

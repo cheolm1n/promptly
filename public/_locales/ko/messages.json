@@ -115,5 +115,17 @@
     },
     "contextMenuAddSelectedTextAsPrompt": {
         "message" : "선택한 텍스트를 프롬프트로 추가"
+    },
+    "footerReleaseNote": {
+        "message" : "릴리즈 노트"
+    },
+    "footerCredits": {
+        "message" : "만든이들"
+    },
+    "footerGithub": {
+        "message" : "GitHub 저장소"
+    },
+    "footerSupportHub": {
+        "message" : "지원 허브"
     }
 }

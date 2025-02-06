@@ -1,31 +1,34 @@
 <template>
   <Toast position="bottom-center" class="promptly-toast" />
-  <div class="custom-tabmenu">
-    <div
-      class="tab-item"
-      :class="{ active: activeIndex === 0 }"
-      @click="activeIndex = 0"
-    >
-      <i class="pi pi-home icon-spacing"></i>
-      <span>MAIN</span>
+  <div class="scroll-area">
+    <div class="custom-tabmenu">
+      <div
+        class="tab-item"
+        :class="{ active: activeIndex === 0 }"
+        @click="activeIndex = 0"
+      >
+        <i class="pi pi-home icon-spacing"></i>
+        <span>MAIN</span>
+      </div>
+      <div
+        class="tab-item"
+        :class="{ active: activeIndex === 1 }"
+        @click="activeIndex = 1"
+      >
+        <i class="pi pi-pencil icon-spacing"></i>
+        <span>MANAGE</span>
+      </div>
     </div>
-    <div
-      class="tab-item"
-      :class="{ active: activeIndex === 1 }"
-      @click="activeIndex = 1"
-    >
-      <i class="pi pi-pencil icon-spacing"></i>
-      <span>MANAGE</span>
+    <div class="tab-content">
+      <MainPage v-if="activeIndex === 0" ref="mainPage" />
+      <PromptManagementPage
+        v-else
+        ref="promptManagementPage"
+        @use-prompt="onUsePrompt"
+      />
     </div>
   </div>
-  <div class="tab-content">
-    <MainPage v-if="activeIndex === 0" ref="mainPage" />
-    <PromptManagementPage
-      v-else
-      ref="promptManagementPage"
-      @use-prompt="onUsePrompt"
-    />
-  </div>
+  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -33,6 +36,7 @@ import MainPage from "./components/MainPage.vue";
 import PromptManagementPage from "./components/PromptManagementPage.vue";
 import { nextTick, onMounted, ref, useTemplateRef } from "vue";
 import { PromptDataWithId } from "./types/prompt";
+import Footer from "./components/Footer.vue"; // Footer 컴포넌트 임포트
 
 const activeIndex = ref(0);
 const promptManagementPage = useTemplateRef("promptManagementPage");
@@ -73,6 +77,11 @@ onMounted(() => {
   width: 400px;
   overflow: hidden;
   position: relative;
+}
+
+.scroll-area {
+  min-height: 100%;
+  padding-bottom: 30px;
 }
 
 .promptly-toast {

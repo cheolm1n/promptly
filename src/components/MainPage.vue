@@ -137,7 +137,8 @@ const modelOptions = (
   [
     { label: "ChatGPT 4o", model: "gpt-4o" },
     { label: "ChatGPT o1", model: "o1" },
-    { label: "ChatGPT o1-mini", model: "o1-mini" },
+    { label: "ChatGPT o3-mini", model: "o3-mini" },
+    { label: "ChatGPT o3-mini-high", model: "o3-mini-high" },
     { label: "ChatGPT 4o mini", model: "gpt-4o-mini" },
     { label: "ChatGPT 4", model: "gpt-4" },
     { separator: true },

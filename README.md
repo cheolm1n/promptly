@@ -68,6 +68,6 @@ AI 모델을 활용해 작업할 때 자주 사용되는 프롬프트를 관리�
 - 아이콘 디자인: [![Instagram Badge](https://img.shields.io/badge/-su.roo0v0-E4405F?style=flat-square&logo=Instagram&logoColor=white&link=https://www.instagram.com/su.roo0v0)](https://www.instagram.com/su.roo0v0)
 
 ## 후원
-본 확장 프로그램이 도움이 되셨다면 개발자에게 띠뜻한 커피로 마음을 전해보세요! 
+본 확장 프로그램이 도움이 되셨다면 개발자에게 따뜻한 커피로 마음을 전해보세요! 
 
 [![Buy Me a Coffee](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzRjcG5mMnNmbmZ2cThieTZrejIyeTBxNDh4eW1va2psbzczZGppbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/hXMGQqJFlIQMOjpsKC/giphy.webp)](https://buymeacoffee.com/cheolm1nde8)
